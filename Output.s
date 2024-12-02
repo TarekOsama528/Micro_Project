@@ -12,6 +12,7 @@ RCC_APB2ENR EQU 0x18 + RCC_BASE
 
 GPIOA_CRL EQU GPIOx_CRL + GPIOA_BASE
 GPIOA_IDR EQU GPIOA_BASE + GPIOx_IDR
+
 INTERVAL EQU 0X1FF
 
 	AREA OUTPUT_CODE, CODE, READONLY
@@ -28,11 +29,13 @@ Op FUNCTION
 	
 	LDR R0, =GPIOA_CRL ;to configure first pin of port A as output(medium speed)
 	LDR R1,[R0]
+	bic r1,r1,#0x0F
 	ORR R1,R1,#0x01
 	STR R1,[R0]
 	
 	LDR R0, =GPIOA_ODR ;to write 1 on PA0
 	LDR R1,[R0]
+	bic R1,r1,#0xf
 	ORR R1,R1,#0x01
 	STR R1,[R0]
 	POP {R0-R12,PC}

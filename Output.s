@@ -35,7 +35,7 @@ Op FUNCTION
 	
 	LDR R0, =GPIOA_ODR ;to write 1 on PA0
 	LDR R1,[R0]
-	bic R1,r1,#0xf
+	bic R1,r1,#0x0F
 	ORR R1,R1,#0x01
 	STR R1,[R0]
 	POP {R0-R12,PC}

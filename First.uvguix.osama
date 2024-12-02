@@ -1865,7 +1865,7 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>.\source.s</Name>
-        <ColumnNumber>7</ColumnNumber>
+        <ColumnNumber>9</ColumnNumber>
         <TopLine>1</TopLine>
         <CurrentLine>25</CurrentLine>
         <Folding>1</Folding>
@@ -1874,9 +1874,9 @@
       </Doc>
       <Doc>
         <Name>.\Output.s</Name>
-        <ColumnNumber>18</ColumnNumber>
-        <TopLine>1</TopLine>
-        <CurrentLine>6</CurrentLine>
+        <ColumnNumber>15</ColumnNumber>
+        <TopLine>5</TopLine>
+        <CurrentLine>37</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>

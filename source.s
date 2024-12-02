@@ -22,6 +22,6 @@
 
 __main FUNCTION
 	
-	BL main_Output
+	BL Op
 	ENDFUNC
 	END

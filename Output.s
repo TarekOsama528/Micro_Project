@@ -19,6 +19,7 @@ INTERVAL EQU 0X1FF
 
 main_Output FUNCTION
 	
+Op FUNCTION
 	PUSH {R0-R12, LR}
 	LDR R0 ,=RCC_APB2ENR ;to enable port A
 	LDR R1,[R0]
@@ -35,6 +36,8 @@ main_Output FUNCTION
 	ORR R1,R1,#0x01
 	STR R1,[R0]
 	POP {R0-R12,PC}
+	
+	ENDFUNC
 	
 	ENDFUNC
 	END

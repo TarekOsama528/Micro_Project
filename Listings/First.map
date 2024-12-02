@@ -28,7 +28,6 @@ Section Cross References
 
 Removing Unused input sections from the image.
 
-    Removing source.o(OUTPUT_CODE), (60 bytes).
     Removing output.o(OUTPUT_CODE), (60 bytes).
     Removing system_stm32f10x.o(.text), (0 bytes).
     Removing system_stm32f10x.o(.ARM.exidx.text.SystemInit), (8 bytes).
@@ -39,7 +38,7 @@ Removing Unused input sections from the image.
     Removing system_stm32f10x.o(.data.SystemCoreClock), (4 bytes).
     Removing system_stm32f10x.o(.rodata.AHBPrescTable), (16 bytes).
 
-10 unused section(s) (total 462 bytes) removed from the image.
+9 unused section(s) (total 402 bytes) removed from the image.
 
 ==============================================================================
 
@@ -56,14 +55,14 @@ Image Symbol Table
     source.s                                 0x00000000   Number         0  source.o ABSOLUTE
     system_stm32f10x.c                       0x00000000   Number         0  system_stm32f10x.o ABSOLUTE
     RESET                                    0x08000000   Section      236  startup_stm32f10x_md.o(RESET)
-    .text                                    0x080000ec   Section       64  startup_stm32f10x_md.o(.text)
-    .text                                    0x0800012c   Section        0  heapauxi.o(.text)
-    SetSysClock                              0x08000135   Thumb Code     8  system_stm32f10x.o(.text.SetSysClock)
-    [Anonymous Symbol]                       0x08000134   Section        0  system_stm32f10x.o(.text.SetSysClock)
-    SetSysClockTo72                          0x0800013d   Thumb Code   290  system_stm32f10x.o(.text.SetSysClockTo72)
-    [Anonymous Symbol]                       0x0800013c   Section        0  system_stm32f10x.o(.text.SetSysClockTo72)
-    [Anonymous Symbol]                       0x08000260   Section        0  system_stm32f10x.o(.text.SystemInit)
-    MYCODE                                   0x080002c8   Section      164  source.o(MYCODE)
+    .text                                    0x080000ec   Section       96  startup_stm32f10x_md.o(.text)
+    .text                                    0x0800014c   Section        0  heapauxi.o(.text)
+    SetSysClock                              0x08000155   Thumb Code     8  system_stm32f10x.o(.text.SetSysClock)
+    [Anonymous Symbol]                       0x08000154   Section        0  system_stm32f10x.o(.text.SetSysClock)
+    SetSysClockTo72                          0x0800015d   Thumb Code   290  system_stm32f10x.o(.text.SetSysClockTo72)
+    [Anonymous Symbol]                       0x0800015c   Section        0  system_stm32f10x.o(.text.SetSysClockTo72)
+    [Anonymous Symbol]                       0x08000280   Section        0  system_stm32f10x.o(.text.SystemInit)
+    MYCODE                                   0x080002e8   Section      136  source.o(MYCODE)
     Heap_Mem                                 0x20000000   Data         512  startup_stm32f10x_md.o(HEAP)
     HEAP                                     0x20000000   Section      512  startup_stm32f10x_md.o(HEAP)
     Stack_Mem                                0x20000200   Data        1024  startup_stm32f10x_md.o(STACK)
@@ -88,55 +87,55 @@ Image Symbol Table
     DebugMon_Handler                         0x08000101   Thumb Code     2  startup_stm32f10x_md.o(.text)
     PendSV_Handler                           0x08000103   Thumb Code     2  startup_stm32f10x_md.o(.text)
     SysTick_Handler                          0x08000105   Thumb Code     2  startup_stm32f10x_md.o(.text)
-    ADC1_2_IRQHandler                        0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    CAN1_RX1_IRQHandler                      0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    CAN1_SCE_IRQHandler                      0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel1_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel2_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel3_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel4_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel5_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel6_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    DMA1_Channel7_IRQHandler                 0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     EXTI0_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI15_10_IRQHandler                     0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI1_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI2_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI3_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI4_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    EXTI9_5_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     FLASH_IRQHandler                         0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    I2C1_ER_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    I2C1_EV_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    I2C2_ER_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    I2C2_EV_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     PVD_IRQHandler                           0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     RCC_IRQHandler                           0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    RTCAlarm_IRQHandler                      0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     RTC_IRQHandler                           0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    SPI1_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    SPI2_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     TAMPER_IRQHandler                        0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM1_BRK_IRQHandler                      0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM1_CC_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM1_TRG_COM_IRQHandler                  0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM1_UP_IRQHandler                       0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM2_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM3_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    TIM4_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USART1_IRQHandler                        0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USART2_IRQHandler                        0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USART3_IRQHandler                        0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USBWakeUp_IRQHandler                     0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USB_HP_CAN1_TX_IRQHandler                0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USB_LP_CAN1_RX0_IRQHandler               0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
     WWDG_IRQHandler                          0x08000107   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    __user_initial_stackheap                 0x08000109   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    __use_two_region_memory                  0x0800012d   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_escrow$2region                 0x0800012f   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_expand$2region                 0x08000131   Thumb Code     2  heapauxi.o(.text)
-    SystemInit                               0x08000261   Thumb Code   102  system_stm32f10x.o(.text.SystemInit)
-    __main                                   0x080002c9   Thumb Code   128  source.o(MYCODE)
+    ADC1_2_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    CAN1_RX1_IRQHandler                      0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    CAN1_SCE_IRQHandler                      0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel1_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel2_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel3_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel4_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel5_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel6_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    DMA1_Channel7_IRQHandler                 0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI15_10_IRQHandler                     0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI1_IRQHandler                         0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI2_IRQHandler                         0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI3_IRQHandler                         0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI4_IRQHandler                         0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    EXTI9_5_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    I2C1_ER_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    I2C1_EV_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    I2C2_ER_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    I2C2_EV_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    RTCAlarm_IRQHandler                      0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    SPI1_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    SPI2_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM1_BRK_IRQHandler                      0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM1_CC_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM1_TRG_COM_IRQHandler                  0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM1_UP_IRQHandler                       0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM2_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM3_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    TIM4_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USART1_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USART2_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USART3_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USBWakeUp_IRQHandler                     0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USB_HP_CAN1_TX_IRQHandler                0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    USB_LP_CAN1_RX0_IRQHandler               0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    __user_initial_stackheap                 0x08000121   Thumb Code     0  startup_stm32f10x_md.o(.text)
+    __use_two_region_memory                  0x0800014d   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_escrow$2region                 0x0800014f   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_expand$2region                 0x08000151   Thumb Code     2  heapauxi.o(.text)
+    SystemInit                               0x08000281   Thumb Code   102  system_stm32f10x.o(.text.SystemInit)
+    __main                                   0x080002e9   Thumb Code     0  source.o(MYCODE)
 
 
 
@@ -146,35 +145,35 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_1 (Base: 0x08000000, Size: 0x0000036c, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x08000000, Size: 0x00000370, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x0000036c, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000370, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x08000000   0x08000000   0x000000ec   Data   RO           17    RESET               startup_stm32f10x_md.o
-    0x080000ec   0x080000ec   0x00000040   Code   RO           18  * .text               startup_stm32f10x_md.o
-    0x0800012c   0x0800012c   0x00000006   Code   RO           41    .text               c_w.l(heapauxi.o)
-    0x08000132   0x08000132   0x00000002   PAD
-    0x08000134   0x08000134   0x00000008   Code   RO           25    .text.SetSysClock   system_stm32f10x.o
-    0x0800013c   0x0800013c   0x00000122   Code   RO           29    .text.SetSysClockTo72  system_stm32f10x.o
-    0x0800025e   0x0800025e   0x00000002   PAD
-    0x08000260   0x08000260   0x00000066   Code   RO           23    .text.SystemInit    system_stm32f10x.o
-    0x080002c6   0x080002c6   0x00000002   PAD
-    0x080002c8   0x080002c8   0x000000a4   Code   RO            2  * MYCODE              source.o
+    0x08000000   0x08000000   0x000000ec   Data   RO           12    RESET               startup_stm32f10x_md.o
+    0x080000ec   0x080000ec   0x00000060   Code   RO           13  * .text               startup_stm32f10x_md.o
+    0x0800014c   0x0800014c   0x00000006   Code   RO           36    .text               c_w.l(heapauxi.o)
+    0x08000152   0x08000152   0x00000002   PAD
+    0x08000154   0x08000154   0x00000008   Code   RO           20    .text.SetSysClock   system_stm32f10x.o
+    0x0800015c   0x0800015c   0x00000122   Code   RO           24    .text.SetSysClockTo72  system_stm32f10x.o
+    0x0800027e   0x0800027e   0x00000002   PAD
+    0x08000280   0x08000280   0x00000066   Code   RO           18    .text.SystemInit    system_stm32f10x.o
+    0x080002e6   0x080002e6   0x00000002   PAD
+    0x080002e8   0x080002e8   0x00000088   Code   RO            1  * MYCODE              source.o
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x0800036c, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x08000370, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
 
     **** No section assigned to this execution region ****
 
 
-    Execution Region ER_ZI (Exec base: 0x20000000, Load base: 0x0800036c, Size: 0x00000600, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x20000000, Load base: 0x08000370, Size: 0x00000600, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000        -       0x00000200   Zero   RW           16    HEAP                startup_stm32f10x_md.o
-    0x20000200        -       0x00000400   Zero   RW           15    STACK               startup_stm32f10x_md.o
+    0x20000000        -       0x00000200   Zero   RW           11    HEAP                startup_stm32f10x_md.o
+    0x20000200        -       0x00000400   Zero   RW           10    STACK               startup_stm32f10x_md.o
 
 
 ==============================================================================
@@ -184,12 +183,12 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       164         36          0          0          0        384   source.o
-        64         26        236          0       1536        820   startup_stm32f10x_md.o
-       400          0          0          0          0       3006   system_stm32f10x.o
+       136         32          0          0          0        304   source.o
+        96         34        236          0       1536        840   startup_stm32f10x_md.o
+       400          0          0          0          0       3014   system_stm32f10x.o
 
     ----------------------------------------------------------------------
-       632         62        236          0       1536       4210   Object Totals
+       636         66        236          0       1536       4158   Object Totals
          0          0          0          0          0          0   (incl. Generated)
          4          0          0          0          0          0   (incl. Padding)
 
@@ -219,15 +218,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-       640         62        236          0       1536       4310   Grand Totals
-       640         62        236          0       1536       4310   ELF Image Totals
-       640         62        236          0          0          0   ROM Totals
+       644         66        236          0       1536       4310   Grand Totals
+       644         66        236          0       1536       4310   ELF Image Totals
+       644         66        236          0          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                  876 (   0.86kB)
+    Total RO  Size (Code + RO Data)                  880 (   0.86kB)
     Total RW  Size (RW Data + ZI Data)              1536 (   1.50kB)
-    Total ROM Size (Code + RO Data + RW Data)        876 (   0.86kB)
+    Total ROM Size (Code + RO Data + RW Data)        880 (   0.86kB)
 
 ==============================================================================
 

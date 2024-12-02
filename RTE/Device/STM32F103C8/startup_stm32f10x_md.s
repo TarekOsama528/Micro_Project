@@ -235,6 +235,18 @@ RTC_IRQHandler
 FLASH_IRQHandler
 RCC_IRQHandler
 EXTI0_IRQHandler
+	PUSH {R0-R3, LR}            ; Save registers
+    LDR R0, =0x40010414            ; EXTI_PR address
+    LDR R1, [R0]
+    ORR R1, R1, #(1 << 0)       ; Clear EXTI0 pending flag
+    STR R1, [R0]                ; Write back
+
+    ; Toggle PA1
+    LDR R0, =0x4001080C          ; GPIOA_ODR address
+    LDR R1, [R0]
+    EOR R1, R1, #(1 << 1)       ; Toggle PA1
+    STR R1, [R0]                ; Write back
+    POP {R0-R3, PC}             ; Restore registers and return
 EXTI1_IRQHandler
 EXTI2_IRQHandler
 EXTI3_IRQHandler

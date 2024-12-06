@@ -31,7 +31,7 @@ Removing Unused input sections from the image.
     Removing source.o(MYDATA), (0 bytes).
     Removing output.o(OUTPUT_CODE), (60 bytes).
     Removing tft.o(MYDATA), (0 bytes).
-    Removing tft.o(MYCODE), (656 bytes).
+    Removing tft.o(MYCODE), (696 bytes).
     Removing definitions.o(MYDATA), (0 bytes).
     Removing system_stm32f10x.o(.text), (0 bytes).
     Removing system_stm32f10x.o(.ARM.exidx.text.SystemInit), (8 bytes).
@@ -42,7 +42,7 @@ Removing Unused input sections from the image.
     Removing system_stm32f10x.o(.data.SystemCoreClock), (4 bytes).
     Removing system_stm32f10x.o(.rodata.AHBPrescTable), (16 bytes).
 
-13 unused section(s) (total 1058 bytes) removed from the image.
+13 unused section(s) (total 1098 bytes) removed from the image.
 
 ==============================================================================
 

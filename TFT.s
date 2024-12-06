@@ -17,12 +17,6 @@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ FUNCTIONS' DEFINITIONS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-
-	
-
-
-
 ;#####################################################################################################################################################################
 LCD_WRITE
 	;this function takes what is inside r2 and writes it to the tft
@@ -42,15 +36,16 @@ LCD_WRITE
 	bl reset_pin
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
 	;;;;;;;;;;;;; HERE YOU PUT YOUR DATA which is in R2 TO PE0-7 ;;;;;;;;;;;;;;;;;
 	;TODO: SET PE0-7 WITH THE LOWER 8-bits of R2
 	;only write the lower byte to PE0-7
 	LDR R0, =GPIOA_ODR
 	LDR R1, [R0]
 	MOV R1, R3
-	STRB R1, [R0]
+	AND R1,R1,#0xFFFFFF00
+	AND R3,R3,#0x0FF
+	ORR R1,R1,R3
+	STR R1, [R0]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -66,12 +61,6 @@ LCD_WRITE
 	;TODO: POP THE REGISTERS YOU JUST PUSHED, and PC
 	POP {R0-R12, PC}
 ;#####################################################################################################################################################################
-
-
-
-
-
-
 
 
 
@@ -135,8 +124,6 @@ LCD_DATA_WRITE
 	MOV R2, #0x0A
 	BL set_pin
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-
 
 
 	;;;;;;;;;;;;;;;;;;;; SETTING RS to 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -558,12 +545,14 @@ SETUP
 ;	ADD r1, r1, #0x0c	;go to PUPDR of GPIOE which is at offset 0x0C from base of GPIOE
 ;	STR r0, [r1]
 
-
+	;MOV R0,#0
     ;DELETE ANY GARBAGE IN PORT A
 	LDR r1, =GPIOA_ODR
 	LDR r0, [r1]
-	ORR r0, #0x00007F00 ;(DATA =0 & CS =0)
-	STRH r0, [r1]
+	MOV R0,#0
+	ORR r0,R0, #0x00007F00 ;(DATA =0 & CS =0)
+	;AND R0,R0,0x0000FFFF
+	STR r0, [r1]
 	
 
 	BL LCD_INIT

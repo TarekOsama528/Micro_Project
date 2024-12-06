@@ -14,37 +14,40 @@ __main FUNCTION
 	;CALL FUNCTION SETUP
 	BL SETUP
 	
-;	MOV r0, #0; x1
-;	MOV r3, #320; x2
-;	MOV r1, #0; y1
-;	mov r4, #240; y2
-;	mov r10, #BLACK
-;	BL DRAW_RECTANGLE_FILLED
-;	
-;	mov r0,#0; X1
-;	mov r3, #320
-;	
-;	mov r1,#0; Y1
-;	mov r4, #80
-;	mov r10, #RED
-;	BL DRAW_RECTANGLE_FILLED
-;	
-;	mov r1,#81; Y1
-;	mov r4, #160
+	MOV r0, #0; x1
+	MOV r3, #480; x2
+	MOV r1, #0; y1
+	mov r4, #320; y2
+	mov r10, #GREEN
+	BL DRAW_RECTANGLE_FILLED
+	
+	mov r0,#0; X1
+	mov r3, #480
+	
+	mov r1,#0; Y1
+	mov r4, #106
+	mov r10, #RED
+	BL DRAW_RECTANGLE_FILLED
+	
+	
+;	mov r1,#107; Y1
+;	mov r4, #212
 ;	mov r10, #WHITE
 ;	BL DRAW_RECTANGLE_FILLED
 
-;	mov r1,#161; Y1
-;	mov r4, #240
-;	mov r10, #BLACK
-;	BL DRAW_RECTANGLE_FILLED
-;	
-;	MOV r0, #140; x1
-;	MOV r3, #180; x2
-;	MOV r1, #100; y1
-;	mov r4, #140; y2
-;	MOV R10, #BLUE
-;	BL DRAW_RECTANGLE_FILLED
+	mov r0,#0
+	mov r3,#480
+	mov r1,#213; Y1
+	mov r4, #320
+	mov r10, #BLACK
+	BL DRAW_RECTANGLE_FILLED
+	
+	MOV r0, #140; x1?
+	MOV r3, #180; x2
+	MOV r1, #100; y1
+	mov r4, #140; y2
+	MOV R10, #BLUE
+	BL DRAW_RECTANGLE_FILLED
 	
 	
 

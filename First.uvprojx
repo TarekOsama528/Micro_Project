@@ -394,6 +394,16 @@
               <FileType>2</FileType>
               <FilePath>.\Output.s</FilePath>
             </File>
+            <File>
+              <FileName>TFT.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\TFT.s</FilePath>
+            </File>
+            <File>
+              <FileName>DEFINITIONS.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\DEFINITIONS.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

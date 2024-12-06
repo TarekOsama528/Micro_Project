@@ -1,78 +1,55 @@
     ;INCLUDE Output.s
+	INCLUDE TFT.s
 
     AREA MYCODE, CODE, READONLY
     EXPORT __main
-;    IMPORT EXTI0_IRQHandler
     ENTRY 
+	
+__main FUNCTION
 
-RCC_APB2ENR EQU 0x40021018
-GPIOA_CRL   EQU 0x40010800
-GPIOA_ODR   EQU 0x4001080C
-AFIO_EXTICR1 EQU 0x40010008
-EXTI_RTSR   EQU 0x40010408
-EXTI_FTSR   EQU 0x4001040C
-EXTI_IMR    EQU 0x40010400
-;EXTI_PR     EQU 0x40010414
-NVIC_ISER0  EQU 0xE000E100
-
-__main
-    ; Enable clock for AFIO and GPIOA
-    LDR R0, =RCC_APB2ENR        ; RCC_APB2ENR address
-    LDR R1, [R0]                ; Read current value
-    ORR R1, R1, #(1 << 0)       ; Enable AFIO clock
-    ORR R1, R1, #(1 << 2)       ; Enable GPIOA clock
-    STR R1, [R0]                ; Write back
-
-    ; Configure PA0 as input with pull-up
-    LDR R0, =GPIOA_CRL          ; GPIOA_CRL address
-    LDR R1, [R0]                ; Read current value
-    BIC R1, R1, #0xF            ; Clear configuration for PA0
-    ORR R1, R1, #(0x8)          ; Input with pull-up/down
-    STR R1, [R0]                ; Write back
-    LDR R0, =GPIOA_ODR          ; GPIOA_ODR address
-    LDR R1, [R0]                ; Read ODR value
-    ORR R1, R1, #(1 << 0)       ; Enable pull-up for PA0
-    STR R1, [R0]                ; Write back
-
-    ; Map PA0 to EXTI0
-    LDR R0, =AFIO_EXTICR1       ; AFIO_EXTICR1 address
-    LDR R1, [R0]                ; Read current value
-    BIC R1, R1, #0xF            ; Clear EXTI0 mapping bits
-    STR R1, [R0]                ; Write back (PA0 -> EXTI0)
-
-    ; Configure EXTI0
-    LDR R0, =EXTI_IMR           ; EXTI_IMR address
-    LDR R1, [R0]                ; Read current value
-    ORR R1, R1, #(1 << 0)       ; Unmask EXTI0
-    STR R1, [R0]                ; Write back
-    LDR R0, =EXTI_RTSR          ; EXTI_RTSR address
-    LDR R1, [R0]
-    ORR R1, R1, #(1 << 0)       ; Enable rising edge trigger
-    STR R1, [R0]                ; Write back
-    LDR R0, =EXTI_FTSR          ; EXTI_FTSR address
-    LDR R1, [R0]
-    BIC R1, R1, #(1 << 0)       ; Disable falling edge trigger
-    STR R1, [R0]                ; Write back
-
-    ; Enable EXTI0 interrupt in NVIC
-    LDR R0, =NVIC_ISER0         ; NVIC_ISER0 address
-    LDR R1, [R0]
-    ORR R1, R1, #(1 << 6)       ; Enable IRQ6 (EXTI0)
-    STR R1, [R0]                ; Write back
-
-    ; Configure PA1 as output
-    LDR R0, =GPIOA_CRL          ; GPIOA_CRL address
-    LDR R1, [R0]                ; Read current value
-    BIC R1, R1, #(0xF << 4)     ; Clear PA1 bits
-    ORR R1, R1, #(0x2 << 4)     ; Set PA1 as output, push-pull, 2MHz
-    STR R1, [R0]                ; Write back
-
-    
+	;This is the main funcion, you should only call two functions, one that sets up the TFT
+	;And the other that draws a rectangle over the entire screen (ie from (0,0) to (320,240)) with a certain color of your choice
 
 
-infinite
-    B infinite                  ; Infinite loop
+	;CALL FUNCTION SETUP
+	BL SETUP
+	
+;	MOV r0, #0; x1
+;	MOV r3, #320; x2
+;	MOV r1, #0; y1
+;	mov r4, #240; y2
+;	mov r10, #BLACK
+;	BL DRAW_RECTANGLE_FILLED
+;	
+;	mov r0,#0; X1
+;	mov r3, #320
+;	
+;	mov r1,#0; Y1
+;	mov r4, #80
+;	mov r10, #RED
+;	BL DRAW_RECTANGLE_FILLED
+;	
+;	mov r1,#81; Y1
+;	mov r4, #160
+;	mov r10, #WHITE
+;	BL DRAW_RECTANGLE_FILLED
 
-; EXTI0 Interrupt Handler
+;	mov r1,#161; Y1
+;	mov r4, #240
+;	mov r10, #BLACK
+;	BL DRAW_RECTANGLE_FILLED
+;	
+;	MOV r0, #140; x1
+;	MOV r3, #180; x2
+;	MOV r1, #100; y1
+;	mov r4, #140; y2
+;	MOV R10, #BLUE
+;	BL DRAW_RECTANGLE_FILLED
+	
+	
 
+	;FINAL TODO: DRAW THE ENTIRE SCREEN WITH A CERTAIN COLOR
+
+	;TODO: draw egypt
+	ENDFUNC
     END

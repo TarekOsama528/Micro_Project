@@ -17,12 +17,6 @@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ FUNCTIONS' DEFINITIONS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-
-	
-
-
-
 ;#####################################################################################################################################################################
 LCD_WRITE
 	;this function takes what is inside r2 and writes it to the tft
@@ -42,20 +36,16 @@ LCD_WRITE
 	bl reset_pin
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
 	;;;;;;;;;;;;; HERE YOU PUT YOUR DATA which is in R2 TO PE0-7 ;;;;;;;;;;;;;;;;;
 	;TODO: SET PE0-7 WITH THE LOWER 8-bits of R2
 	;only write the lower byte to PE0-7
 	LDR R0, =GPIOA_ODR
 	LDR R1, [R0]
-;	MOV R1, R3
-;	STRB R1, [R0]
-
+	MOV R1, R3
 	AND R1,R1,#0xFFFFFF00
-	AND R3,R3, #0x0FF
-	ORR R1,R3,R1
-	STR R1,[R0]
+	AND R3,R3,#0x0FF
+	ORR R1,R1,R3
+	STR R1, [R0]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -71,12 +61,6 @@ LCD_WRITE
 	;TODO: POP THE REGISTERS YOU JUST PUSHED, and PC
 	POP {R0-R12, PC}
 ;#####################################################################################################################################################################
-
-
-
-
-
-
 
 
 
@@ -140,8 +124,6 @@ LCD_DATA_WRITE
 	MOV R2, #0x0A
 	BL set_pin
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-
 
 
 	;;;;;;;;;;;;;;;;;;;; SETTING RS to 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -185,19 +167,19 @@ LCD_INIT
 	
 
 	;TODO: DELAY FOR SOME TIME (USE ANY FUNCTION AT THE BOTTOM OF THIS FILE)
-	bl delay_half_second
+	bl delay_1_second
 
 	;TODO: RESET RESET PIN TO LOW
 	BL reset_pin
 
 	;TODO: DELAY FOR SOME TIME (USE ANY FUNCTION AT THE BOTTOM OF THIS FILE)
-	bl delay_half_second
+	bl delay_1_second
 
 	;TODO: SET RESET PIN TO HIGH AGAIN
 	bl set_pin
 
 	;TODO: DELAY FOR SOME TIME (USE ANY FUNCTION AT THE BOTTOM OF THIS FILE)
-	bl delay_half_second
+	bl delay_1_second
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -230,19 +212,19 @@ LCD_INIT
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SOFTWARE INITIALIZATION SEQUENCE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;ISSUE THE "SET CONTRAST" COMMAND, ITS HEX CODE IS 0xC5
-;	MOV R2, #0xC5
-;	BL LCD_COMMAND_WRITE
+	MOV R2, #0xC5
+	BL LCD_COMMAND_WRITE
 
-;	;THIS COMMAND REQUIRES 2 PARAMETERS TO BE SENT AS DATA, THE VCOM H, AND THE VCOM L
-;	;WE WANT TO SET VCOM H TO A SPECIFIC VOLTAGE WITH CORRESPONDS TO A BINARY CODE OF 1111111 OR 0x7F HEXA
-;	;SEND THE FIRST PARAMETER (THE VCOM H) NEEDED BY THE COMMAND, WITH HEX 0x7F, PARAMETERS ARE SENT AS DATA BUT COMMANDS ARE SENT AS COMMANDS
-;	MOV R2, #0x7F
-;	BL LCD_DATA_WRITE
+	;THIS COMMAND REQUIRES 2 PARAMETERS TO BE SENT AS DATA, THE VCOM H, AND THE VCOM L
+	;WE WANT TO SET VCOM H TO A SPECIFIC VOLTAGE WITH CORRESPONDS TO A BINARY CODE OF 1111111 OR 0x7F HEXA
+	;SEND THE FIRST PARAMETER (THE VCOM H) NEEDED BY THE COMMAND, WITH HEX 0x7F, PARAMETERS ARE SENT AS DATA BUT COMMANDS ARE SENT AS COMMANDS
+	MOV R2, #0x7F
+	BL LCD_DATA_WRITE
 
-;	;WE WANT TO SET VCOM L TO A SPECIFIC VOLTAGE WITH CORRESPONDS TO A BINARY CODE OF 00000000 OR 0x00 HEXA
-;	;SEND THE SECOND PARAMETER (THE VCOM L) NEEDED BY THE CONTRAST COMMAND, WITH HEX 0x00, PARAMETERS ARE SENT AS DATA BUT COMMANDS ARE SENT AS COMMANDS
-;	MOV R2, #0x00
-;	BL LCD_DATA_WRITE
+	;WE WANT TO SET VCOM L TO A SPECIFIC VOLTAGE WITH CORRESPONDS TO A BINARY CODE OF 00000000 OR 0x00 HEXA
+	;SEND THE SECOND PARAMETER (THE VCOM L) NEEDED BY THE CONTRAST COMMAND, WITH HEX 0x00, PARAMETERS ARE SENT AS DATA BUT COMMANDS ARE SENT AS COMMANDS
+	MOV R2, #0x00
+	BL LCD_DATA_WRITE
 
 
 	;MEMORY ACCESS CONTROL AKA MADCLT | DATASHEET PAGE 127
@@ -277,22 +259,21 @@ LCD_INIT
 	;NECESSARY TO WAIT 5ms BEFORE SENDING NEXT COMMAND
 	;I WILL WAIT FOR 10MSEC TO BE SURE
 	;TODO: DELAY FOR AT LEAST 10ms
-	BL delay_half_second
+	BL delay_1_second
 
 
 	;DISPLAY ON | DATASHEET PAGE 109
 	;TODO: ISSUE THE COMMAND, IT TAKES NO PARAMETERS
 	MOV R2, #0x29
 	BL LCD_COMMAND_WRITE
-	
 
 
 	;COLOR INVERSION OFF | DATASHEET PAGE 105
 	;NOTE: SOME TFTs HAS COLOR INVERTED BY DEFAULT, SO YOU WOULD HAVE TO INVERT THE COLOR MANUALLY SO COLORS APPEAR NATURAL
 	;MEANING THAT IF THE COLORS ARE INVERTED WHILE YOU ALREADY TURNED OFF INVERSION, YOU HAVE TO TURN ON INVERSION NOT TURN IT OFF.
 	;TODO: ISSUE THE COMMAND, IT TAKES NO PARAMETERS
-;	MOV R2, #0x20
-;	BL LCD_COMMAND_WRITE
+	;MOV R2, #0x20
+	;BL LCD_COMMAND_WRITE
 	MOV R2, #0x21
 	BL LCD_COMMAND_WRITE
 	
@@ -531,11 +512,13 @@ SETUP
 	
 	;Make the GPIO A mode as output (01 for each pin)
 	LDR r0, =GPIOA_CRL
+	LDR r1,[r0]
 	mov r1, #0x11111111
 	STR r1, [r0]
 	
 	LDR R0,=GPIOA_CRH
-	MOV R1, #0x11111111
+	LDR R1,[R0]
+	MOV R1,#0x11111111
 	STR R1,[R0]
 	
 	
@@ -564,12 +547,14 @@ SETUP
 ;	ADD r1, r1, #0x0c	;go to PUPDR of GPIOE which is at offset 0x0C from base of GPIOE
 ;	STR r0, [r1]
 
-
+	;MOV R0,#0
     ;DELETE ANY GARBAGE IN PORT A
 	LDR r1, =GPIOA_ODR
 	LDR r0, [r1]
-	ORR r0, #0x00007F00 ;(DATA =0 & CS =0)
-	STRH r0, [r1]
+	MOV R0,#0
+	ORR r0,R0, #0x00007F00 ;(DATA =0 & CS =0)
+	;AND R0,R0,0x0000FFFF
+	STR r0, [r1]
 	
 
 	BL LCD_INIT

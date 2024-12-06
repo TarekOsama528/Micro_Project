@@ -41,7 +41,7 @@ LCD_WRITE
 	;only write the lower byte to PE0-7
 	LDR R0, =GPIOA_ODR
 	LDR R1, [R0]
-	MOV R1, R3
+	;MOV R1, R3
 	AND R1,R1,#0xFFFFFF00
 	AND R3,R3,#0x0FF
 	ORR R1,R1,R3

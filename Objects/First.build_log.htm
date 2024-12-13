@@ -27,18 +27,16 @@ Project File Date:  12/13/2024
 <h2>Output:</h2>
 *** Using Compiler 'V6.22', folder: 'C:\Users\osama\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target_1'
-"source.s", line 5: Warning: A1581W: Added 2 bytes of padding at address 0x6a
-    5 0000006c     AREA MYCODE, CODE, READONLY
-"source.s", line 69: Warning: A1581W: Added 2 bytes of padding at address 0x8a
-   69 0000008c     END
-0 Errors, 2 Warnings
-assembling source.s...
-"RTC.s", line 66: Warning: A1581W: Added 2 bytes of padding at address 0x6a
-   66 0000006c  END
+"RTC.s", line 77: Warning: A1581W: Added 2 bytes of padding at address 0x76
+   77 00000078  END
 0 Errors, 1 Warning
 assembling RTC.s...
+"source.s", line 5: Warning: A1581W: Added 2 bytes of padding at address 0x76
+    5 00000078     AREA MYCODE, CODE, READONLY
+0 Errors, 1 Warning
+assembling source.s...
 linking...
-Program Size: Code=652 RO-data=236 RW-data=0 ZI-data=1536  
+Program Size: Code=688 RO-data=236 RW-data=0 ZI-data=1536  
 ".\Objects\First.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
@@ -66,10 +64,10 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE@6.1.0
 
    * Component: Keil::Device:Startup@1.0.0
-      Source file:   Device/Source/system_stm32f10x.c
-      Include file:  RTE_Driver/Config/RTE_Device.h
       Source file:   Device/Source/ARM/STM32F1xx_OPT.s
       Source file:   Device/Source/ARM/startup_stm32f10x_md.s
+      Include file:  RTE_Driver/Config/RTE_Device.h
+      Source file:   Device/Source/system_stm32f10x.c
 Build Time Elapsed:  00:00:04
 </pre>
 </body>

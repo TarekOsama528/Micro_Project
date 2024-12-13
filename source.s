@@ -65,5 +65,18 @@ LOOPP
 	LDR R1,[R0]
 	B LOOPP
 	
+delay_1_second
+	;this function just delays for 1 second
+	PUSH {R8, LR}
+	LDR r8, =INTERVAL
+delay_loop
+	SUBS r8, #1
+	CMP r8, #0
+	BGE delay_loop
+	POP {R8, PC}
+	
 	ENDFUNC
     END
+		
+		
+		

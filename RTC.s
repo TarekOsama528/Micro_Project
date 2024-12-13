@@ -16,6 +16,11 @@ RTC_INIT
     LDR R1, [R0]       
     ORR R1, R1, #0x100        ; Set DBP bit (bit 8) page 77/78
     STR R1, [R0]       ; Write back to PWR_CR
+	
+	; Wait for DBP bit to take effect
+    LDR R1, [R0]
+    TST R1, #0x100            ; Check if DBP is set
+    BEQ RTC_INIT              ; Retry if not set
 
     ; Enable LSE Oscillator
     LDR R0, =RCC_BDCR     ; Read RCC_BDCR
@@ -28,24 +33,30 @@ wait_lse_ready
     TST R1, #0x02             ; Check LSERDY bit (bit 1) page 118/119
     BEQ wait_lse_ready       ; Wait until LSE is ready
 
-    ; Select LSE as RTC Clock Source and Enable RTC
+    ; Select LSE as RTC Clock Source
     LDR R1, [R0]       ; Read RCC_BDCR
     ORR R1, R1, #(1 << 8)     ; Set RTCSEL to 01 (LSE as clock source) page 118/119
+	STR R1, [R0]       ; Write back to RCC_BDCR
+	
+	; Enable RTC
+	LDR R1, [R0]       ; Read RCC_BDCR
     ORR R1, R1, #(1 << 15)    ; Set RTCEN bit (bit 15) page 118/119
     STR R1, [R0]       ; Write back to RCC_BDCR
 
     ; Wait for RTC Synchronization
-    LDR R0, =RTC_CRL       ; Read RTC_CRL
-    LDR R1, [R0]       
-    TST R1, #0x20             ; Check RTOFF bit (bit 5) page 488
-    BEQ wait_sync            ; Wait until RTC is synchronized
+    LDR R0, =RTC_CRL          ; RTC_CRL base address
+wait_rsf
+    LDR R1, [R0]
+    TST R1, #0x20             ; Check RSF bit (bit 5) page 488
+    BEQ wait_rsf              ; Wait until synchronization
 
     ; Enter RTC Configuration Mode
     ORR R1, R1, #0x10         ; Set CNF bit (bit 4) page 488
     STR R1, [R0]       ; Write back to RTC_CRL
 	
-	LDR R0,=RTC_BASE
+	
     ; Set RTC Prescaler to 32767 (LSE / (32767 + 1) = 1 Hz)
+	LDR R0,=RTC_BASE
     LDR R1, =0x0000           ; High part of prescaler (RTC_PRLH = 0)
     STR R1, [R0, #0x08]       ; Write to RTC_PRLH
     LDR R1, =0x7FFF           ; Low part of prescaler (RTC_PRLL = 32767) page 489/490
@@ -54,13 +65,13 @@ wait_lse_ready
     ; Exit RTC Configuration Mode
 	LDR R0,=RTC_CRL
     LDR R1, [R0]       ; Read RTC_CRL
-    BIC R1, R1, #0x10         ; Clear CNF bit (bit 4) page 488
+    BIC R1, R1, #0x10  ; Clear CNF bit (bit 4) page 488
     STR R1, [R0]       ; Write back to RTC_CRL
 
 wait_sync
     LDR R1, [R0]       ; Read RTC_CRL
-    TST R1, #0x20             ; Check RTOFF bit (bit 5) page 488
-    BEQ wait_sync            ; Wait until RTOFF is set
+    TST R1, #0x20      ; Check RTOFF bit (bit 5) page 488
+    BEQ wait_sync      ; Wait until RTOFF is set
 		
 	POP {R0-R12, PC}
 	END

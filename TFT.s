@@ -49,7 +49,7 @@ LCD_WRITE
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-	delay_milli_second
+	BL delay_milli_second
 	;;;;;;;;;;;;;;;;;;;;;;;;;; SETTING WR to 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;TODO: SET WR TO 1 AGAIN (ie make a rising edge)
 	MOV R2,  #0x0B

@@ -1,5 +1,6 @@
     ;INCLUDE Output.s
-	INCLUDE TFT.s
+	;INCLUDE TFT.s
+	INCLUDE RTC.S
 
     AREA MYCODE, CODE, READONLY
     EXPORT __main

@@ -269,6 +269,24 @@ TIM1_UP_IRQHandler
 TIM1_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM2_IRQHandler
+    PUSH {R0-R3, LR}            ; Save working registers
+
+    ; Clear the Update Interrupt Flag
+    LDR R0, =0x40000000
+    LDR R1, [R0, #0x10]         ; Read TIM2_SR
+    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
+    STR R1, [R0, #0x10]
+
+    ; Toggle LED on PB0
+    LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
+    LDR R1, [R0]                ; Read current state
+    BIC R1, R1, #0x01           ; Toggle PB0 (bit 0)
+    STR R1, [R0]                ; Write back to GPIOB_ODR
+	
+	LDR R0,=0x40000000
+	LDR R1, =999                  ; Auto-reload value (1-second period at 1 kHz)
+    STR R1, [R0, #0x2C]           ; Write to TIM2_ARR
+    POP {R0-R3, PC}             ; Restore working registers and return
 TIM3_IRQHandler
 TIM4_IRQHandler
 I2C1_EV_IRQHandler

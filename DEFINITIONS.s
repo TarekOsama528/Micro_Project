@@ -41,6 +41,8 @@ RTC_PRLH EQU RTC_BASE + 0x08
 RTC_CNTH EQU RTC_BASE + 0x18
 RTC_CNTL EQU RTC_BASE + 0x1C
 
+TIM2_BASE EQU 0x40000000
+
 	
 INTERVAL EQU 0x186004		;just a number to perform the delay. this number takes roughly 1 second to decrement until it reaches 0
 	

@@ -404,6 +404,11 @@
               <FileType>2</FileType>
               <FilePath>.\DEFINITIONS.s</FilePath>
             </File>
+            <File>
+              <FileName>RTC.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\RTC.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

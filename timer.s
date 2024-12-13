@@ -21,7 +21,7 @@ TIMER_INIT
 	
 	LDR R0, =0x40010C0C         ; GPIOB Output Data Register
     LDR R1, [R0]                ; Read current state
-    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
+    ORR R1, R1, #0x01           ; Turn on the LED PB0 (bit 0)
     STR R1, [R0] 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -33,7 +33,7 @@ TIMER_INIT
 
     ; Configure TIM2 Prescaler (PSC)
     LDR R0, =TIM2_BASE            ; TIM2 base address
-    LDR R1, =7999                ; Prescaler value (for 1 kHz if clock is 8 MHz)
+    LDR R1, =15999                ; Prescaler value (for 1 kHz if clock is 16 MHz)
     STR R1, [R0, #0x28]           ; Write to TIM2_PSC
 
     ; Configure TIM2 Auto-Reload Register (ARR)

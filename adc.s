@@ -1,19 +1,9 @@
-    
-	;INCLUDE Output.s
-	;INCLUDE TFT.s
-	;INCLUDE RTC.S
-	;INCLUDE timer.s
-	INCLUDE DEFINITIONS.s	
-		
-    AREA MYCODE, CODE, READONLY
-    EXPORT __main
-    ENTRY 
+	INCLUDE DEFINITIONS.s
 	
-__main FUNCTION
+	AREA MYCODE, CODE, READONLY
 
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Enable GPIOB and ADC clocks
+MAIN
+    ; Enable GPIOB and ADC clocks
     LDR R0, =RCC_APB2ENR
     LDR R1, [R0]
     ORR R1, R1, #(1 << 3)       ; Enable GPIOB clock
@@ -102,9 +92,3 @@ led_off
     BIC R1, R1, #(1 << 1)       ; Clear PB1
     STR R1, [R0]
     B loop
-	
-	ENDFUNC
-    END
-		
-		
-		

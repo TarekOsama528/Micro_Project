@@ -27,7 +27,7 @@ MAIN
     LDR R1, [R0]
     ORR R1, R1, #(1 << 0)       ; Set ADON bit to power up ADC
     STR R1, [R0]
-
+	B delay_1_second
     ; Start ADC calibration
     ORR R1, R1, #(1 << 2)       ; Set CAL bit to start calibration
     STR R1, [R0]
@@ -92,3 +92,14 @@ led_off
     BIC R1, R1, #(1 << 1)       ; Clear PB1
     STR R1, [R0]
     B loop
+	
+	
+delay_1_second
+	;this function just delays for 1 second
+	PUSH {R8, LR}
+	LDR r8, =INTERVAL
+delay_loop
+	SUBS r8, #1
+	CMP r8, #0
+	BGE delay_loop
+	POP {R8, PC}

@@ -91,13 +91,9 @@ ALARM_INIT
 	
 	LDR R0, =GPIOB_CRL ;to configure PB3 as output(medium speed)
 	LDR R1,[R0]
-<<<<<<< Updated upstream
-	bic r1,r1,#0xF
-	ORR R1,R1,#0x1
-=======
 	bic r1,r1,#0x0F
 	ORR R1,R1,#0x01
->>>>>>> Stashed changes
+
 	STR R1,[R0]
 
     ; Step 1: Enable RTC Clock Source and Synchronization
@@ -141,6 +137,13 @@ wait_rtoff1
     LDR R1, [R0]                 ; Read RTC_CRL
     TST R1, #0x20                ; Check RTOFF bit (bit 5)
     BEQ wait_rtoff1              ; Wait until RTOFF is set
+	
+	
+	; Clear pending alarm interrupt
+	LDR R0, =0xE000E284 ;ICPR1 Offset is 0x184 page 123 (programming manual)
+	LDR R1,[R0]
+	MOV R1,#(1 << 9)
+	STR R1,[R0]
 
     ; Step 7: Enable Alarm Interrupt in NVIC
     LDR R0, =0xE000E104         ; NVIC_BASE address + ISER1 offset

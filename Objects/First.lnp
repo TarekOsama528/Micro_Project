@@ -1,6 +1,6 @@
 --cpu Cortex-M3
-".\objects\source.o"
 ".\objects\output.o"
+".\objects\source.o"
 ".\objects\tft.o"
 ".\objects\definitions.o"
 ".\objects\rtc.o"

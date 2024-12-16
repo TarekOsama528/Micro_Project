@@ -282,6 +282,8 @@ TIM2_IRQHandler
     LDR R1, [R0]                ; Read current state
     EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
     STR R1, [R0]                ; Write back to GPIOB_ODR
+	
+	POP {R0-R3, PC}
 TIM3_IRQHandler
 TIM4_IRQHandler
 I2C1_EV_IRQHandler
@@ -295,6 +297,21 @@ USART2_IRQHandler
 USART3_IRQHandler
 EXTI15_10_IRQHandler
 RTCAlarm_IRQHandler
+	PUSH {R0-R12, LR}
+	
+
+	LDR R0, =0x40002804           ; Address of RTC_CRL
+    LDR R1, [R0]
+    BIC R1, R1, #0x02            ; Clear ALRF bit (bit 1)
+    STR R1, [R0]                 ; Write back to RTC_CRL
+	
+	LDR R0, =0x40010C0C ;to write 1 on PB0
+	LDR R1,[R0]
+	ORR R1,R1,#0x01
+	STR R1,[R0]
+	
+	
+	POP {R0-R12, PC}
 USBWakeUp_IRQHandler
 
                 B       .

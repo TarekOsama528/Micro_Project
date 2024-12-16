@@ -134,8 +134,8 @@ wait_rtoff1
     BEQ wait_rtoff1              ; Wait until RTOFF is set
 
     ; Step 7: Enable Alarm Interrupt in NVIC
-    LDR R0, =0xE000E100          ; NVIC_ISER0 base address
-    LDR R1, =(1 << 17)           ; RTC Alarm IRQ number is 17 (bit position)
+    LDR R0, =0xE000E104         ; NVIC_BASE address + ISER1 offset
+    LDR R1, =(1 << 9)           ; RTC Alarm IRQ number is 17 (bit position)
     STR R1, [R0]                 ; Enable RTC Alarm interrupt
 
     POP {R0-R12, PC}             ; Restore registers and return

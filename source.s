@@ -112,8 +112,6 @@ Lop1
 	LDR R0,=RTC_CNTL
 	LDR R1,[R0]
 	
-	;LDR R0,=RTC_CNTH
-	;LDR R1,[R0]
 	B Lop1
 	
 	

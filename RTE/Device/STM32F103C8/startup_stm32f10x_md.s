@@ -184,49 +184,49 @@ SysTick_Handler PROC
 
 Default_Handler PROC
 
-                EXPORT  WWDG_IRQHandler            [WEAK]
-                EXPORT  PVD_IRQHandler             [WEAK]
-                EXPORT  TAMPER_IRQHandler          [WEAK]
-                EXPORT  RTC_IRQHandler             [WEAK]
-                EXPORT  FLASH_IRQHandler           [WEAK]
-                EXPORT  RCC_IRQHandler             [WEAK]
-                EXPORT  EXTI0_IRQHandler           [WEAK]
-                EXPORT  EXTI1_IRQHandler           [WEAK]
-                EXPORT  EXTI2_IRQHandler           [WEAK]
-                EXPORT  EXTI3_IRQHandler           [WEAK]
-                EXPORT  EXTI4_IRQHandler           [WEAK]
-                EXPORT  DMA1_Channel1_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel2_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel3_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel4_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel5_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel6_IRQHandler   [WEAK]
-                EXPORT  DMA1_Channel7_IRQHandler   [WEAK]
-                EXPORT  ADC1_2_IRQHandler          [WEAK]
-                EXPORT  USB_HP_CAN1_TX_IRQHandler  [WEAK]
-                EXPORT  USB_LP_CAN1_RX0_IRQHandler [WEAK]
-                EXPORT  CAN1_RX1_IRQHandler        [WEAK]
-                EXPORT  CAN1_SCE_IRQHandler        [WEAK]
-                EXPORT  EXTI9_5_IRQHandler         [WEAK]
-                EXPORT  TIM1_BRK_IRQHandler        [WEAK]
-                EXPORT  TIM1_UP_IRQHandler         [WEAK]
-                EXPORT  TIM1_TRG_COM_IRQHandler    [WEAK]
-                EXPORT  TIM1_CC_IRQHandler         [WEAK]
-                EXPORT  TIM2_IRQHandler            [WEAK]
-                EXPORT  TIM3_IRQHandler            [WEAK]
-                EXPORT  TIM4_IRQHandler            [WEAK]
-                EXPORT  I2C1_EV_IRQHandler         [WEAK]
-                EXPORT  I2C1_ER_IRQHandler         [WEAK]
-                EXPORT  I2C2_EV_IRQHandler         [WEAK]
-                EXPORT  I2C2_ER_IRQHandler         [WEAK]
-                EXPORT  SPI1_IRQHandler            [WEAK]
-                EXPORT  SPI2_IRQHandler            [WEAK]
-                EXPORT  USART1_IRQHandler          [WEAK]
-                EXPORT  USART2_IRQHandler          [WEAK]
-                EXPORT  USART3_IRQHandler          [WEAK]
-                EXPORT  EXTI15_10_IRQHandler       [WEAK]
-                EXPORT  RTCAlarm_IRQHandler        [WEAK]
-                EXPORT  USBWakeUp_IRQHandler       [WEAK]
+                EXPORT  WWDG_IRQHandler            [WEAK] ;0
+                EXPORT  PVD_IRQHandler             [WEAK] ;1
+                EXPORT  TAMPER_IRQHandler          [WEAK] ;2
+                EXPORT  RTC_IRQHandler             [WEAK] ;3
+                EXPORT  FLASH_IRQHandler           [WEAK] ;4
+                EXPORT  RCC_IRQHandler             [WEAK] ;5
+                EXPORT  EXTI0_IRQHandler           [WEAK] ;6
+                EXPORT  EXTI1_IRQHandler           [WEAK] ;7
+                EXPORT  EXTI2_IRQHandler           [WEAK] ;8
+                EXPORT  EXTI3_IRQHandler           [WEAK] ;9
+                EXPORT  EXTI4_IRQHandler           [WEAK] ;10
+                EXPORT  DMA1_Channel1_IRQHandler   [WEAK] ;11
+                EXPORT  DMA1_Channel2_IRQHandler   [WEAK] ;12
+                EXPORT  DMA1_Channel3_IRQHandler   [WEAK] ;13
+                EXPORT  DMA1_Channel4_IRQHandler   [WEAK] ;14
+                EXPORT  DMA1_Channel5_IRQHandler   [WEAK] ;15
+                EXPORT  DMA1_Channel6_IRQHandler   [WEAK] ;16
+                EXPORT  DMA1_Channel7_IRQHandler   [WEAK] ;17
+                EXPORT  ADC1_2_IRQHandler          [WEAK] ;18
+                EXPORT  USB_HP_CAN1_TX_IRQHandler  [WEAK] ;19
+                EXPORT  USB_LP_CAN1_RX0_IRQHandler [WEAK] ;20
+                EXPORT  CAN1_RX1_IRQHandler        [WEAK] ;21
+                EXPORT  CAN1_SCE_IRQHandler        [WEAK] ;22
+                EXPORT  EXTI9_5_IRQHandler         [WEAK] ;23
+                EXPORT  TIM1_BRK_IRQHandler        [WEAK] ;24
+                EXPORT  TIM1_UP_IRQHandler         [WEAK] ;25
+                EXPORT  TIM1_TRG_COM_IRQHandler    [WEAK] ;26
+                EXPORT  TIM1_CC_IRQHandler         [WEAK] ;27
+                EXPORT  TIM2_IRQHandler            [WEAK] ;28
+                EXPORT  TIM3_IRQHandler            [WEAK] ;29
+                EXPORT  TIM4_IRQHandler            [WEAK] ;30
+                EXPORT  I2C1_EV_IRQHandler         [WEAK] ;31
+                EXPORT  I2C1_ER_IRQHandler         [WEAK] ;32 ;0
+                EXPORT  I2C2_EV_IRQHandler         [WEAK] ;33 ;1
+                EXPORT  I2C2_ER_IRQHandler         [WEAK] ;34 ;2
+                EXPORT  SPI1_IRQHandler            [WEAK] ;35 ;3
+                EXPORT  SPI2_IRQHandler            [WEAK] ;36 ;4
+                EXPORT  USART1_IRQHandler          [WEAK] ;37 ;5
+                EXPORT  USART2_IRQHandler          [WEAK] ;38 ;6
+                EXPORT  USART3_IRQHandler          [WEAK] ;39 ;7
+                EXPORT  EXTI15_10_IRQHandler       [WEAK] ;40 ;8
+                EXPORT  RTCAlarm_IRQHandler        [WEAK] ;41 ;9
+                EXPORT  USBWakeUp_IRQHandler       [WEAK] ;42 ;10
 
 WWDG_IRQHandler
 PVD_IRQHandler

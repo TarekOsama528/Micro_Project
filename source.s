@@ -18,9 +18,9 @@ __main FUNCTION
 
 	
 	BL RTC_INIT
-
-;	; Enter RTC Configuration Mode
-;    LDR R0, =RTC_CRL             ; Address of RTC_CRL
+	BL ALARM_INIT
+	; Enter RTC Configuration Mode
+    ;LDR R0, =RTC_CRL             ; Address of RTC_CRL
 ;wait_rsf_sync2
 ;    LDR R1, [R0]                 ; Read RTC_CRL
 ;    TST R1, #0x20                ; Check RSF bit (bit 5)
@@ -40,7 +40,7 @@ __main FUNCTION
 ;    BIC R1, R1, #0x10            ; Clear CNF bit (bit 4) to exit configuration mode
 ;    STR R1, [R0]                 ; Write back to RTC_CRL
 
-;    ; Wait for Configuration to Complete
+    ; Wait for Configuration to Complete
 ;wait_rtoff1
 ;    LDR R1, [R0]                 ; Read RTC_CRL
 ;    TST R1, #0x20                ; Check RTOFF bit (bit 5)

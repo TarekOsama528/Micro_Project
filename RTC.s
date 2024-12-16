@@ -91,8 +91,8 @@ ALARM_INIT
 	
 	LDR R0, =GPIOB_CRL ;to configure PB3 as output(medium speed)
 	LDR R1,[R0]
-	bic r1,r1,#0xF000
-	ORR R1,R1,#0x1000
+	bic r1,r1,#0xF
+	ORR R1,R1,#0x1
 	STR R1,[R0]
 
     ; Step 1: Enable RTC Clock Source and Synchronization

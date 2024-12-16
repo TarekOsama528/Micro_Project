@@ -79,7 +79,7 @@ wait_rtoff
 
     POP {R0-R12, PC}             ; Restore registers and return
 	
-;**********************************************************
+;******************************************************************************************
 	
 ALARM_INIT
 	PUSH {R0-R12, LR}
@@ -91,8 +91,13 @@ ALARM_INIT
 	
 	LDR R0, =GPIOB_CRL ;to configure PB3 as output(medium speed)
 	LDR R1,[R0]
+<<<<<<< Updated upstream
 	bic r1,r1,#0xF
 	ORR R1,R1,#0x1
+=======
+	bic r1,r1,#0x0F
+	ORR R1,R1,#0x01
+>>>>>>> Stashed changes
 	STR R1,[R0]
 
     ; Step 1: Enable RTC Clock Source and Synchronization

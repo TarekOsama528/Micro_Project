@@ -51,7 +51,7 @@ wait_lse_ready
     LDR R0, =RTC_CRL             ; RTC control register
 wait_rsf
     LDR R1, [R0]
-    TST R1, #0x20                ; Check RSF bit (bit 5)
+    TST R1, #0x20                ; Check RSF bit (bit 5) user must wait until it's set to be sure that the RTC_CNT, RTC_ALR or RTC_PRL registers are synchronized.
     BEQ wait_rsf                 ; Wait until RSF is set
 
     ; Enter RTC Configuration Mode
@@ -100,20 +100,24 @@ ALARM_INIT
 
     ; Step 2: Enter RTC Configuration Mode
     LDR R0, =RTC_CRL             ; Address of RTC_CRL
-wait_rsf_sync
+wait_rsf1
     LDR R1, [R0]                 ; Read RTC_CRL
     TST R1, #0x20                ; Check RSF bit (bit 5)
-    BEQ wait_rsf_sync            ; Wait for synchronization (RSF set)
+    BEQ wait_rsf1            ; Wait for synchronization (RSF set)
 
     ORR R1, R1, #0x10            ; Set CNF bit (bit 4) to enter configuration mode
     STR R1, [R0]                 ; Write back to RTC_CRL
 
     ; Step 3: Set Alarm Value
-    LDR R0, =RTC_BASE            ; Base address of RTC registers
+    LDR R0, =RTC_ALRH            ; Base address of RTC registers
+	LDR R1, [R0]
     LDR R1, =0x0000              ; High part of the alarm
-    STR R1, [R0, #0x1C]          ; Write to RTC_ALRH (Alarm High Register)
+    STR R1, [R0]          ; Write to RTC_ALRH (Alarm High Register)
+	
+	LDR R0, =RTC_ALRL
+	LDR R1,[R0]
     LDR R1, =0x000A              ; Low part of the alarm (e.g., 10 seconds)
-    STR R1, [R0, #0x18]          ; Write to RTC_ALRL (Alarm Low Register)
+    STR R1, [R0]          ; Write to RTC_ALRL (Alarm Low Register)
 
     ; Step 4: Enable Alarm Interrupt in RTC
     LDR R0, =RTC_CRH             ; Address of RTC_CRH

@@ -1,4 +1,5 @@
 	INCLUDE DEFINITIONS.s  ; Include the file with register definitions
+	EXPORT TIMER_INIT
 
     AREA MYCODE, CODE, READONLY
 
@@ -33,11 +34,11 @@ TIMER_INIT
 
     ; Configure TIM2 Prescaler (PSC)
     LDR R0, =TIM2_BASE            ; TIM2 base address
-    LDR R1, =15999                ; Prescaler value (for 1 kHz if clock is 16 MHz)
+    LDR R1, =64000             ; Prescaler value (for 1 kHz if clock is 16 MHz)
     STR R1, [R0, #0x28]           ; Write to TIM2_PSC
 
     ; Configure TIM2 Auto-Reload Register (ARR)
-    LDR R1, =999                  ; Auto-reload value (1-second period at 1 kHz)
+    LDR R1, =1125              ; Auto-reload value (1-second period at 1 kHz)
     STR R1, [R0, #0x2C]           ; Write to TIM2_ARR
 
     ; Enable Timer Update Interrupt

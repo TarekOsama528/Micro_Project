@@ -9,6 +9,7 @@
 	;IMPORT DRAW_RECTANGLE_FILLED
 	;IMPORT RTC_INIT
 	;IMPORT ALARM_INIT
+	IMPORT TIMER_INIT
 		
     AREA MYCODE, CODE, READONLY
     EXPORT __main
@@ -18,11 +19,12 @@ __main FUNCTION
 
 	
 	BL RTC_INIT
-	BL ALARM_INIT
+	;BL ALARM_INIT
+	;BL TIMER_INIT
 	
 	
-	; Enter RTC Configuration Mode
-    ;LDR R0, =RTC_CRL             ; Address of RTC_CRL
+;	; Enter RTC Configuration Mode
+;    LDR R0, =RTC_CRL             ; Address of RTC_CRL
 ;wait_rsf_sync2
 ;    LDR R1, [R0]                 ; Read RTC_CRL
 ;    TST R1, #0x20                ; Check RSF bit (bit 5)
@@ -42,11 +44,13 @@ __main FUNCTION
 ;    BIC R1, R1, #0x10            ; Clear CNF bit (bit 4) to exit configuration mode
 ;    STR R1, [R0]                 ; Write back to RTC_CRL
 
-    ; Wait for Configuration to Complete
-;wait_rtoff1
+;    ; Wait for Configuration to Complete
+;wait_rtoff2
 ;    LDR R1, [R0]                 ; Read RTC_CRL
 ;    TST R1, #0x20                ; Check RTOFF bit (bit 5)
-;    BEQ wait_rtoff1              ; Wait until RTOFF is set
+;    BEQ wait_rtoff2              ; Wait until RTOFF is set
+;	
+	;BL ALARM_INIT
 	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -56,7 +60,17 @@ Lop1
 	LDR R0,=RTC_CNTL
 	LDR R1,[R0]
 	
+	;CMP R1,#10
+	;BEQ ODR
+
 	B Lop1
+	
+ODR
+	LDR R0, =0x40010C0C ;to write 1 on PB0
+	LDR R1,[R0]
+	ORR R1,R1,#0x01
+	STR R1,[R0]
+	
 	
 	
 	

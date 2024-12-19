@@ -52,7 +52,7 @@
           <OutputName>First</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -418,6 +418,31 @@
               <FileName>adc.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\adc.s</FilePath>
+            </File>
+            <File>
+              <FileName>IR_Sensor.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\IR_Sensor.s</FilePath>
+            </File>
+            <File>
+              <FileName>Buttons.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\Buttons.s</FilePath>
+            </File>
+            <File>
+              <FileName>EXTI4_Handler.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\EXTI4_Handler.s</FilePath>
+            </File>
+            <File>
+              <FileName>DHT.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\DHT.s</FilePath>
+            </File>
+            <File>
+              <FileName>Display.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\Display.s</FilePath>
             </File>
           </Files>
         </Group>

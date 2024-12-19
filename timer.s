@@ -1,9 +1,10 @@
 	INCLUDE DEFINITIONS.s  ; Include the file with register definitions
-	EXPORT TIMER_INIT
+	EXPORT TIMER2_INIT
+	EXPORT TIMER3_INIT
 
     AREA MYCODE, CODE, READONLY
 
-TIMER_INIT
+TIMER2_INIT
 
     PUSH {R0-R3, LR}              ; Save working registers
 
@@ -34,21 +35,21 @@ TIMER_INIT
 
     ; Configure TIM2 Prescaler (PSC)
     LDR R0, =TIM2_BASE            ; TIM2 base address
-    LDR R1, =64000             ; Prescaler value (for 1 kHz if clock is 16 MHz)
+    LDR R1, =72             ; Prescaler value (for 1 kHz if clock is 16 MHz)
     STR R1, [R0, #0x28]           ; Write to TIM2_PSC
 
     ; Configure TIM2 Auto-Reload Register (ARR)
-    LDR R1, =1125              ; Auto-reload value (1-second period at 1 kHz)
+    LDR R1, =0xFFFF              ; Auto-reload value (1-second period at 1 kHz)
     STR R1, [R0, #0x2C]           ; Write to TIM2_ARR
 
     ; Enable Timer Update Interrupt
-    LDR R1, [R0, #0x0C]           ; Read TIM2_DIER (Interrupt Enable Register)
-    ORR R1, R1, #0x01             ; Enable Update Interrupt (UIE, bit 0)
-    STR R1, [R0, #0x0C]           ; Write back to TIM2_DIER
+;    LDR R1, [R0, #0x0C]           ; Read TIM2_DIER (Interrupt Enable Register)
+;    ORR R1, R1, #0x01             ; Enable Update Interrupt (UIE, bit 0)
+;    STR R1, [R0, #0x0C]           ; Write back to TIM2_DIER
 
-	LDR R0, =0xE000E100    ; Address of NVIC_ISER0
-	MOV R1, #(1 << 28)     ; TIM2 IRQ is bit 28
-	STR R1, [R0]           ; Enable TIM2 interrupt
+;	LDR R0, =0xE000E100    ; Address of NVIC_ISER0
+;	MOV R1, #(1 << 28)     ; TIM2 IRQ is bit 28
+;	STR R1, [R0]           ; Enable TIM2 interrupt
 
     ; Start the Timer
     LDR R0, =TIM2_BASE            ; Base address of TIM2
@@ -57,5 +58,52 @@ TIMER_INIT
 	STR R1, [R0, #0x00]           ; Write back to TIM2_CR1
 
     POP {R0-R3, PC}               ; Restore registers and return
+	
+	
+	
+	
+TIMER3_INIT
+	
+	PUSH {R0-R12,LR}
+    ; Enable TIM3 Clock in RCC_APB1ENR
+    LDR R0, =RCC_APB1ENR          ; RCC_APB1ENR address
+    LDR R1, [R0]                  ; Read current value
+    ORR R1, R1, #0x02             ; Set bit 0 to enable TIM2 clock
+    STR R1, [R0]                  ; Write back to RCC_APB1ENR
+	
+	; Configure TIM2 Prescaler (PSC)
+    LDR R0, =TIM3_PSC            ; TIM2 base address
+    LDR R1, =64000            ; Prescaler value (for 1 kHz if clock is 16 MHz)
+    STR R1, [R0]           ; Write to TIM2_PSC
+	
+	; Configure TIM2 Auto-Reload Register (ARR)
+	LDR R0,=TIM3_ARR
+    LDR R1, =1125             ; Auto-reload value (1-second period at 1 kHz)
+    STR R1, [R0]           ; Write to TIM2_ARR
+	
+	; Enable Timer Update Interrupt
+	LDR R0,=TIM3_DIER
+    LDR R1, [R0]           ; Read TIM2_DIER (Interrupt Enable Register)
+    ORR R1, R1, #0x01             ; Enable Update Interrupt (UIE, bit 0)
+    STR R1, [R0]           ; Write back to TIM2_DIER
+	
+	LDR R0, =NVIC_ISER0    ; Address of NVIC_ISER0
+	MOV R1, #(1 << 29)     ; TIM2 IRQ is bit 28
+	STR R1, [R0]           ; Enable TIM2 interrupt
+
+    ; Start the Timer
+    LDR R0, =TIM3_CR1            ; Base address of TIM2
+	LDR R1, [R0]           ; Read TIM2_CR1 (Control Register 1)
+	ORR R1, R1, #0x01             ; Set CEN bit (bit 0) to start the timer
+	STR R1, [R0]           ; Write back to TIM2_CR1
+	
+	POP {R0-R12,PC}
+	
+	
+	
 
     END
+		
+		
+		
+		

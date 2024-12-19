@@ -1,0 +1,86 @@
+	
+	INCLUDE DEFINITIONS.s
+	AREA MYCODE,CODE,READONLY
+		;EXPORT EXTI4_IRQHandler
+		EXPORT Button_init
+		
+		
+Button_init
+    PUSH {R0-R12, LR}             ; Save registers and return address
+    
+	; Enable clock for GPIOB (Bit 3) and AFIO (Bit 0)
+	LDR R0, =0x40021018       ; RCC_APB2ENR address
+	LDR R1, [R0]              ; Read current value
+	ORR R1, R1, #(1 << 3)     ; Enable GPIOB clock
+	ORR R1, R1, #(1 << 0)     ; Enable AFIO clock
+	STR R1, [R0]              ; Write back
+
+	; Configure PB4 as input with pull-up
+	LDR R0, =0x40010C00       ; GPIOB_CRL address
+	LDR R1, [R0]              ; Read current value
+	BIC R1, R1, #(0xF << 16)  ; Clear PB4 bits
+	ORR R1, R1, #(0x8 << 16)  ; Set PB4 as input with pull-up/down
+	STR R1, [R0]              ; Write back
+
+	; Configure PB13 as output
+	LDR R0, =0x40010C04       ; GPIOB_CRH address
+	LDR R1, [R0]              ; Read current value
+	BIC R1, R1, #(0xF << 20)  ; Clear PB13 bits
+	ORR R1, R1, #(0x2 << 20)  ; Set PB13 as output, push-pull, 2MHz
+	STR R1, [R0]              ; Write back
+	
+	; Configure PB14 as output
+	LDR R1, [R0]              ; Read current value again
+	BIC R1, R1, #(0xF << 24)  ; Clear PB14 bits
+	ORR R1, R1, #(0x2 << 24)  ; Set PB14 as output, push-pull, 2MHz
+	STR R1, [R0]              ; Write back
+
+	; Map PB4 to EXTI4
+	LDR R0, =0x4001000C       ; AFIO_EXTICR2 address (EXTI4 is in EXTI_CR2)
+	LDR R1, [R0]              ; Read current value
+	BIC R1, R1, #(0xF << 0)   ; Clear EXTI4 mapping
+	ORR R1, R1, #(0x1 << 0)   ; Map EXTI4 to Port B (0x1)
+	STR R1, [R0]              ; Write back
+
+	; Configure EXTI4
+	LDR R0, =0x40010400       ; EXTI_IMR address
+	LDR R1, [R0]              ; Read current value
+	ORR R1, R1, #(1 << 4)     ; Unmask EXTI4
+	STR R1, [R0]              ; Write back
+
+	LDR R0, =0x40010408       ; EXTI_RTSR address
+	LDR R1, [R0]
+	ORR R1, R1, #(1 << 4)     ; Enable rising edge trigger
+	STR R1, [R0]
+
+	LDR R0, =0x4001040C       ; EXTI_FTSR address
+	LDR R1, [R0]
+	BIC R1, R1, #(1 << 4)     ; Disable falling edge trigger
+	STR R1, [R0]
+
+	; Enable EXTI4 interrupt in NVIC
+	LDR R0, =0xE000E100       ; NVIC_ISER0 address
+	LDR R1, [R0]
+	ORR R1, R1, #(1 << 10)    ; Enable IRQ10 (EXTI4)
+	STR R1, [R0]
+	
+    POP {R0-R12, PC}              ; Restore registers and return
+	
+	
+;EXTI4_IRQHandler
+;	PUSH {R0-R1, LR}
+;	
+;	LDR R0, =0x40010414       ; EXTI_PR address
+;	LDR R1, [R0]
+;	ORR R1, R1, #(1 << 4)     ; Clear EXTI4 pending flag
+;	STR R1, [R0]
+
+;	; Toggle PB13
+;	LDR R0, =0x40010C0C       ; GPIOB_ODR address
+;	LDR R1, [R0]
+;	EOR R1, R1, #(1 << 13)    ; Toggle PB13
+;	STR R1, [R0]
+
+;    POP {R0-R1, PC}
+
+	END

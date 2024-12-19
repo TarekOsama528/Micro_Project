@@ -59,7 +59,8 @@ __heap_limit
                 EXPORT  __Vectors
                 EXPORT  __Vectors_End
                 EXPORT  __Vectors_Size
-
+					
+	EXTERN EXTI4_IRQHandler
 __Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     Reset_Handler              ; Reset Handler
                 DCD     NMI_Handler                ; NMI Handler
@@ -194,7 +195,7 @@ Default_Handler PROC
                 EXPORT  EXTI1_IRQHandler           [WEAK] ;7
                 EXPORT  EXTI2_IRQHandler           [WEAK] ;8
                 EXPORT  EXTI3_IRQHandler           [WEAK] ;9
-                EXPORT  EXTI4_IRQHandler           [WEAK] ;10
+                ;EXPORT  EXTI4_IRQHandler           [WEAK] ;10
                 EXPORT  DMA1_Channel1_IRQHandler   [WEAK] ;11
                 EXPORT  DMA1_Channel2_IRQHandler   [WEAK] ;12
                 EXPORT  DMA1_Channel3_IRQHandler   [WEAK] ;13
@@ -250,7 +251,27 @@ EXTI0_IRQHandler
 EXTI1_IRQHandler
 EXTI2_IRQHandler
 EXTI3_IRQHandler
-EXTI4_IRQHandler
+;EXTI4_IRQHandler
+;    PUSH {R0-R3, LR}              ; Save registers and return address
+
+;;==================================================================================
+;; Check if the interrupt is caused by PB4 (EXTI4)
+;               ; If not, exit handler
+
+;; Clear the interrupt flag for PB4 (EXTI4)
+;    LDR R0, =0x40010414              ; EXTI_PR address
+;    MOV R1, #(1 << 4)             ; Prepare mask for EXTI4
+;    STR R1, [R0]                  ; Clear EXTI4 interrupt flag by writing 1
+
+;; Handle PB4 (Sensor logic or other tasks)
+;    ; Custom logic for PB0 (sensor logic or toggling output pin, etc.)
+;    LDR R0, =0x40010C0C            ; GPIOB_ODR address (Output Data Register)
+;    LDR R1, [R0]                  ; Read current GPIOB_ODR value
+;    EOR R1, R1, #(1 << 0)         ; Toggle PB0 (just as an example)
+;    STR R1, [R0]                  ; Write back to GPIOB_ODR
+
+;;==================================================================================sx         
+;    POP {R0-R3, PC}
 DMA1_Channel1_IRQHandler
 DMA1_Channel2_IRQHandler
 DMA1_Channel3_IRQHandler
@@ -285,6 +306,21 @@ TIM2_IRQHandler
 	
 	POP {R0-R3, PC}
 TIM3_IRQHandler
+    PUSH {R0-R3, LR}            ; Save working registers
+
+    ; Clear the Update Interrupt Flag
+    LDR R0, =0x40000400
+    LDR R1, [R0, #0x10]         ; Read TIM2_SR
+    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
+    STR R1, [R0, #0x10]
+
+    ; Toggle LED on PB0
+    LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
+    LDR R1, [R0]                ; Read current state
+    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
+    STR R1, [R0]                ; Write back to GPIOB_ODR
+	
+	POP {R0-R3, PC}
 TIM4_IRQHandler
 I2C1_EV_IRQHandler
 I2C1_ER_IRQHandler
@@ -296,6 +332,27 @@ USART1_IRQHandler
 USART2_IRQHandler
 USART3_IRQHandler
 EXTI15_10_IRQHandler
+
+    PUSH {R0, R12, LR}
+
+    ; Clear the EXTI13 pending flag
+    LDR R0, =0x40010414       ; EXTI Pending Register address
+    MOV R1, #(1 << 13)        ; Prepare mask for EXTI13
+    STR R1, [R0]              ; Clear the EXTI13 pending flag
+
+    ; Toggle PB12 (LED)
+    LDR R3, =0x40010C0C       ; GPIOB Output Data Register address
+    LDR R4, [R3]              ; Read current output state
+    EOR R4, R4, #(1 << 12)    ; Toggle PB12
+    STR R4, [R3]              ; Write back to GPIOB_ODR
+
+    POP {R0, R12, LR}
+    BX LR                     ; Return from interrupt
+
+;END_HANDLER
+	;BX LR                    ; Return from interrupt
+
+	POP {R0-R12, PC}
 RTCAlarm_IRQHandler
 	PUSH {R0-R12, LR}
 	

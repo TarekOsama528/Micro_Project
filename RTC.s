@@ -1,5 +1,5 @@
 	INCLUDE DEFINITIONS.s
-	;EXPORT RTC_INIT
+	EXPORT RTC_INIT
 	;EXPORT ALARM_INIT
 	
 	AREA MYCODE, CODE, READONLY
@@ -79,7 +79,11 @@ wait_rtoff
 
     POP {R0-R12, PC}             ; Restore registers and return
 	
+	
+	
 ;******************************************************************************************
+
+
 	
 ;ALARM_INIT
 ;	PUSH {R0-R12, LR}
@@ -150,7 +154,25 @@ wait_rtoff
 ;	MOV R1,#(1 << 9)
 ;	STR R1,[R0]
 ;	
+;	LDR     R6, =0x40010400      ;Base address of EXTI
+;	;Configure EXTI line 17 for RTC Alarm
+;	LDR     R0, [R6, #0x08]      ; EXTI_IMR
+;	ORR     R0, R0, #0x20000     ; Unmask line 17
+;	STR     R0, [R6, #0x08]
+
+;	LDR     R0, [R6, #0x0C]      ;EXTI_RTSR
+;	ORR     R0, R0, #0x20000     ; Enable rising trigger for line 17
+;	STR     R0, [R6, #0x0C]
+
+;	LDR     R0, [R6, #0x14]      ;EXTI_PR
+;	ORR     R0, R0, #0x20000     ; Clear pending interrupt flag
+;	STR     R0, [R6, #0x14]
 ;	
+;	    ; Step 7: Enable Alarm Interrupt in NVIC
+;    LDR R0, =0xE000E100         ; NVIC_BASE address + ISER1 offset
+;    LDR R1, =(1 << 17)           ; RTC Alarm IRQ number is 17 (bit position)
+;    STR R1, [R0]                 ; Enable RTC Alarm interrupt
+
 
 ;    ; Step 7: Enable Alarm Interrupt in NVIC
 ;    LDR R0, =0xE000E104         ; NVIC_BASE address + ISER1 offset

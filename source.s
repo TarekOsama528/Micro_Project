@@ -55,18 +55,8 @@ __main FUNCTION
 	MOV R0, #0
 	STR R0 ,[R1]
 	
-	LDR R1,=WEEK_DAY
-	LDR R0, [R1] ;MODE_SELECT Variable
-	MOV R0, #0
-	STR R0 ,[R1]
-	
-	LDR R1,=CONFIG_MODE
-	LDR R0, [R1] ;MODE_SELECT Variable
-	MOV R0, #0
-	STR R0 ,[R1]
-	
-	BL TIMER4_INIT ; TO START TRHE CLOCK
-	;BL TIMER3_INIT ; TO START THE TIMER  TO BE CALLED IN RUNNING MODE
+	BL TIMER4_INIT
+	BL TIMER3_INIT
 	bl SETUP
 	BL BUTTONS_INIT
 	
@@ -89,6 +79,39 @@ __main FUNCTION
 	mov r4,#320
 	mov r10,#WHITE
 	BL DRAW_RECTANGLE_FILLED
+	
+	mov r0, #25
+	mov r1, #25
+	mov r2, #2
+	mov r5, #4
+	BL DRAW_STOPWATCH
+	
+	
+	
+	BL CLOCK_DISPLAY_INIT
+	
+inf
+	BL DISPLAY_REAL_TIME
+	b inf
+;;	LDR R0, =RCC_APB2ENR   ; RCC_APB2ENR Address
+;;	LDR R1, [R0]
+;;	ORR R1, R1, #(1 << 3) ; Enable GPIOB clock
+;;	STR R1, [R0]
+
+;;	;configure PB9 as output
+;;	LDR R0, =GPIOB_CRL
+;;    LDR R1, [R0]
+;;    BIC R1, R1, #(0xF << 0)     ; Clear PB9 configuration
+;;    ORR R1, R1, #(0x3 << 0)     ; Configure PB9 as Output, 10MHz
+;;    STR R1, [R0]
+;;	
+;;	
+;;	mov r0,#0
+;;	mov r3,#480
+;;	mov r1,#0
+;;	mov r4,#320
+;;	mov r10,#WHITE
+;;	BL DRAW_RECTANGLE_FILLED
 ;	
 	;BL RTC_INIT
 	;bl SETUP
@@ -254,10 +277,12 @@ RUN_MODE
 
 	CMP R0,#2
 	BLNE DISPLAY_TIMER_TIME
+;	CMP R0,#0
+;	BLNE DISPLAY_TIMER_TIME
     ;Now R6 contains hours, 
 	;R8 contains minutes, 
 	;R5 contains remaining seconds
-START_STOPWATCH ;TO BE IMPLEMENTED 
+	
 	
 	B Lop1
 	

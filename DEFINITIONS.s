@@ -2,6 +2,24 @@
 
 	AREA MYDATA, DATA, READWRITE
 
+; here we store out variables used across the code as registers could get messed up
+; all are 4BYTES9
+REAL_TIME EQU 0x20000000 ; this variable stores the real time in seconds 4BYTES
+PREV_HOURS EQU 0X20000004 ;PREVIOUS HOURS 
+PREV_MINS EQU 0x20000008	;PREVIOUS MINIUTES
+PREV_SECS EQU 0x20000012 ; PREVIOUS SECONDS
+WEEK_DAY EQU  0x20000016 ; TRACKS THE WEEK DAY 0-SAT 6-FRI
+TIMER_COUNTDOWN EQU 0x20000020 ; THE CURRENT VALUE OF THE TIMER (REAL TIMER MODE)
+MODE_SELECT EQU 0X20000024 ; Stores the current mode according to the value 0:CLOCK 1:ALARM 2:TIMER 3:STOPWATCH
+;FIELD_SELECT EQU 0x20000028 ;Store whether we are incrementing 0:seconds, 1:minutes, 2:hours
+STOPWATCH_TIME EQU 0x20000032 ;store the value of stopwatch
+CONFIG_MODE EQU 0x20000036 ;   0: configuration mode & seconds 1:minutes 2:hours 3:days 4: running mode
+	
+
+
+	
+; End of declared variables
+
 RCC_BASE EQU 0x40021000
 PWR_BASE EQU 0x40007000  
 GPIOA_BASE EQU 0x40010800
@@ -12,6 +30,7 @@ ADC1_BASE EQU 0x40012400
 NVIC_BASE EQU 0xE000E100
 TIM2_BASE EQU 0x40000000
 TIM3_BASE EQU 0x40000400
+TIM4_BASE EQU 0x40000800
 EXTI_BASE EQU 0x40010400
 AFIO_BASE EQU 0x40010000
 	
@@ -76,7 +95,11 @@ TIM3_CR1 EQU TIM3_BASE + 0x00
 TIM3_ARR EQU TIM3_BASE + 0x2C
 TIM3_PSC EQU TIM3_BASE + 0x28
 TIM3_DIER EQU TIM3_BASE + 0x0C
-
+	
+TIM4_CR1 EQU TIM4_BASE + 0x00
+TIM4_ARR EQU TIM4_BASE + 0x2C
+TIM4_PSC EQU TIM4_BASE + 0x28
+TIM4_DIER EQU TIM4_BASE + 0x0C
 	
 INTERVAL EQU 0x186004		;just a number to perform the delay. this number takes roughly 1 second to decrement until it reaches 0
 	

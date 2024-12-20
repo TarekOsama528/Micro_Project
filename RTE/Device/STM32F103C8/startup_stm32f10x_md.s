@@ -290,38 +290,93 @@ TIM1_UP_IRQHandler
 TIM1_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM2_IRQHandler
-    PUSH {R0-R3, LR}            ; Save working registers
+;    PUSH {R0-R3, LR}            ; Save working registers
 
-    ; Clear the Update Interrupt Flag
-    LDR R0, =0x40000000
-    LDR R1, [R0, #0x10]         ; Read TIM2_SR
-    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
-    STR R1, [R0, #0x10]
+;    ; Clear the Update Interrupt Flag
+;    LDR R0, =0x40000000
+;    LDR R1, [R0, #0x10]         ; Read TIM2_SR
+;    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
+;    STR R1, [R0, #0x10]
 
-    ; Toggle LED on PB0
-    LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
-    LDR R1, [R0]                ; Read current state
-    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
-    STR R1, [R0]                ; Write back to GPIOB_ODR
-	
-	POP {R0-R3, PC}
+;    ; Toggle LED on PB0
+;    LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
+;    LDR R1, [R0]                ; Read current state
+;    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
+;    STR R1, [R0]                ; Write back to GPIOB_ODR
+;	
+;	POP {R0-R3, PC}
 TIM3_IRQHandler
     PUSH {R0-R3, LR}            ; Save working registers
-
-    ; Clear the Update Interrupt Flag
+	
+	    ; Clear the Update Interrupt Flag
     LDR R0, =0x40000400
     LDR R1, [R0, #0x10]         ; Read TIM2_SR
     BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
     STR R1, [R0, #0x10]
+	
 
-    ; Toggle LED on PB0
+	
+	LDR R0,=0x20000020
+	LDR R1,[R0]
+	SUB R1,R1,#1
+	STR R1,[R0]
+	CMP R1,#0
+	BNE END_HANDLER
+
+    ;TURN ON on PB0 (BUZZER)
     LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
     LDR R1, [R0]                ; Read current state
-    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
+    ORR R1, R1, #0x01           ; TURN ON PB0 (bit 0)
     STR R1, [R0]                ; Write back to GPIOB_ODR
 	
+	    ; Enable TIM4 Clock in RCC_APB1ENR
+;    LDR R0, =0x4002101C          ; RCC_APB1ENR address
+;    LDR R1, [R0]                  ; Read current value
+;    BIC R1, R1, #0x04             ; Set bit 0 to enable TIM4 clock
+;    STR R1, [R0] 
+	
+	; Start the Timer
+    LDR R0, =0x40000400            ; Base address of TIM3
+	LDR R1, [R0]           ; Read TIM3_CR1 (Control Register 1)
+	BIC R1, R1, #0x01             ; Set CEN bit (bit 0) to start the timer
+	STR R1, [R0]           ; Write back to TIM3_CR1
+	
+	
+END_HANDLER
 	POP {R0-R3, PC}
 TIM4_IRQHandler
+    PUSH {R0-R3, LR}            ; Save working registers
+
+    ; Clear the Update Interrupt Flag
+    LDR R0, =0x40000800
+    LDR R1, [R0, #0x10]         ; Read TIM4_SR
+    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
+    STR R1, [R0, #0x10]
+	
+	LDR R0,=0x20000000 ;REAL_TIME Variable
+	LDR R1,[R0]
+	ADD R1,R1,#1
+	
+	LDR R2, =86400    ; Load 86400 into register R2
+	CMP R1, R2        ; Compare R1 with the value in R2
+	MOVEQ R1,#0
+	STR R1,[R0]
+	
+	LDR R0,=0X20000024
+	LDR R1,[R0]
+	CMP R1,#3
+	BNE END_HANDLER2
+	LDR R0,=0x20000036
+	LDR R1,[R0]
+	CMP R1,#1
+	BNE END_HANDLER2
+	LDR R0,=0x20000032
+	LDR R1,[R0]
+	ADD R1,R1,#1
+	STR R1,[R0]
+	
+END_HANDLER2
+	POP {R0-R3, PC}
 I2C1_EV_IRQHandler
 I2C1_ER_IRQHandler
 I2C2_EV_IRQHandler
@@ -340,35 +395,35 @@ EXTI15_10_IRQHandler
     MOV R1, #(1 << 13)        ; Prepare mask for EXTI13
     STR R1, [R0]              ; Clear the EXTI13 pending flag
 
-    ; Toggle PB12 (LED)
+    ; Turn OFF PB0 (BUZZER)
     LDR R3, =0x40010C0C       ; GPIOB Output Data Register address
     LDR R4, [R3]              ; Read current output state
-    EOR R4, R4, #(1 << 12)    ; Toggle PB12
+    BIC R4, R4, #(1 << 0)    ; Toggle PB12
     STR R4, [R3]              ; Write back to GPIOB_ODR
 
-    POP {R0, R12, LR}
-    BX LR                     ; Return from interrupt
+    POP {R0, R12, PC}
+    ;BX LR                     ; Return from interrupt
 
 ;END_HANDLER
 	;BX LR                    ; Return from interrupt
 
-	POP {R0-R12, PC}
+	;POP {R0-R12, PC}
 RTCAlarm_IRQHandler
-	PUSH {R0-R12, LR}
-	
+;	PUSH {R0-R12, LR}
+;	
 
-	LDR R0, =0x40002804           ; Address of RTC_CRL
-    LDR R1, [R0]
-    BIC R1, R1, #0x02            ; Clear ALRF bit (bit 1)
-    STR R1, [R0]                 ; Write back to RTC_CRL
-	
-	LDR R0, =0x40010C0C ;to write 1 on PB0
-	LDR R1,[R0]
-	ORR R1,R1,#0x01
-	STR R1,[R0]
-	
-	
-	POP {R0-R12, PC}
+;	LDR R0, =0x40002804           ; Address of RTC_CRL
+;    LDR R1, [R0]
+;    BIC R1, R1, #0x02            ; Clear ALRF bit (bit 1)
+;    STR R1, [R0]                 ; Write back to RTC_CRL
+;	
+;	LDR R0, =0x40010C0C ;to write 1 on PB0
+;	LDR R1,[R0]
+;	ORR R1,R1,#0x01
+;	STR R1,[R0]
+;	
+;	
+;	POP {R0-R12, PC}
 USBWakeUp_IRQHandler
 
                 B       .

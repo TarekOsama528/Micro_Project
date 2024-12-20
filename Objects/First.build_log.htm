@@ -27,12 +27,14 @@ Project File Date:  12/19/2024
 <h2>Output:</h2>
 *** Using Compiler 'V6.22', folder: 'C:\Users\osama\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target_1'
-"source.s", line 240: Warning: A1581W: Added 2 bytes of padding at address 0xa82
-  240 00000a84     END
-0 Errors, 1 Warning
-assembling source.s...
+"Buttons.s", line 3: Warning: A1581W: Added 2 bytes of padding at address 0xb66
+    3 00000b68  AREA MYCODE,CODE,READONLY
+"Buttons.s", line 174: Warning: A1581W: Added 2 bytes of padding at address 0xc76
+  174 00000c78  END
+0 Errors, 2 Warnings
+assembling Buttons.s...
 linking...
-Program Size: Code=3964 RO-data=236 RW-data=0 ZI-data=1536  
+Program Size: Code=7604 RO-data=236 RW-data=0 ZI-data=1536  
 FromELF: creating hex file...
 ".\Objects\First.axf" - 0 Error(s), 0 Warning(s).
 
@@ -62,10 +64,10 @@ Package Vendor: Keil
 
    * Component: Keil::Device:Startup@1.0.0
       Include file:  RTE_Driver/Config/RTE_Device.h
-      Source file:   Device/Source/system_stm32f10x.c
       Source file:   Device/Source/ARM/STM32F1xx_OPT.s
       Source file:   Device/Source/ARM/startup_stm32f10x_md.s
-Build Time Elapsed:  00:00:02
+      Source file:   Device/Source/system_stm32f10x.c
+Build Time Elapsed:  00:00:06
 </pre>
 </body>
 </html>

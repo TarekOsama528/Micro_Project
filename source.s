@@ -89,9 +89,9 @@ __main FUNCTION
 	BL DRAW_CLOCK
 	
 	
-;inf
-;	BL DISPLAY_REAL_TIME
-;	b inf
+inf
+	BL DISPLAY_REAL_TIME
+	b inf
 
 
 
@@ -258,7 +258,7 @@ START_STOPWATCH
 	LDR R0,=GPIOB_IDR
 	LDR R1,[R0]
 	TST R1,#(0<<6)   ;check if we pressed CONFIG button PB6 (PULL_UP)
-	BNE MAIN_LOOP
+	BNE Lop1
 	
 	LDR R0,=CONFIG_MODE   ;CONFIG_MODE check
 	LDR R1,[R0]

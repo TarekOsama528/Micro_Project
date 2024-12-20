@@ -1,1130 +1,362 @@
 	INCLUDE TFT.s
+		
 	AREA MYCODE, CODE, READONLY
-		
-		
-		
-;DRAW_NUMBER_ZERO
-;	PUSH {R0-R12,LR}
-;	MOV R0, #50	;X1
-;	MOV R1, #100 ;Y1
-;	MOV R3, #120 ;X2
-;	MOV R4, #200 ;Y2
-;	MOV R10, #RED ;Color (Red)
-;	BL DRAW_RECTANGLE_FILLED
-;	
-;	
-;	MOV R0, #70 ;X1
-;	MOV R1, #120 ;Y1
-;	MOV R3, #100 ;X2
-;	MOV R4, #180 ;Y2
-;	MOV R10, #WHITE ;Color (White)
-;	BL DRAW_RECTANGLE_FILLED
-;	
-;	POP {R0-R12,PC}
 
-;Width of every number = 50
-;Height of every number = 80
 
-;Starting y is 114
-;ending y is 194
-DRAW_NUMBER_ZERO
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6 ;62
-    MOV R1, R7 ; 114  ; X2 = base_x + 120
-    ADD R3, R6, #50   ; Y2 = base_y + 200
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
+; USAGE
+;-------
+; provide images of width 9 and height 12 pixels
+; define a scaler and a starting point
+; colors are constant, make them variable if needed
+DRAW_IMG
+	; r0 = Xstart (top-left X)
+	; r1 = Ystart (top-left Y)
+	; r2 = scaler -> int
+	; r3 = Bitmap Address (pointer to bitmap data)
+	; r6 = width
+	; r11 = height
+	push {r0-r12, lr}
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0,R6, #10
-    ADD R1,R7, #10   ; X2 =  base_x + 120
-    ADD R3,R6, #40   ; Y2 = base_y + 200
-	ADD R4,R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+	ldr r7, [r3] ; load the first double-word
 	
+	; initilaize them with Xstart and Ystart
+	; r4 -> Xi
+	; r5 -> Yi
+	; r6 -> width
+	; r11 -> height
+	mov r4, r0
+	mov r5, r1 
+;	mov r6, #9
+;	mov r11, #12
+infinite_loop
+    mov r8, #32             ; Set r8 to 32 for processing 32 bits
+process_bits
+	
+	MUL R9, R2, R6      ; R9 = scaler * width (R2 = scaler)
+    ADD R9, R9, R0      ; R9 = Xstart + (scaler * width) (R0 = Xstart)
+	cmp r4, r9          ; Compare Xi (R4) with R9 = (Xstart + scaler * width) 
+	blo not_end_of_row
+	
+	; if (Xi >= Xstart + scaler * width)
+	mov r4, r0 ; Xi(r4) = Xstart(r0)
+	add r5, r2 ; Yi(r5) = Yi + scaler(r2)
+	
+	; if (Yi >= Ystart + scaler * height)
+	MUL R9, R2, R11     ; R9 = scaler * height (R2 = scaler)
+    ADD R9, R9, R1      ; R2 = Ystart + (scaler * height) (R1 = Ystart)
+	cmp r5, r9          ; Compare Yi (R5) with R9 = (Ystart + scaler * height) 
+	bhs end_of_image
 
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+not_end_of_row	
+    lsr r9, r7, #31         ; Extract the most significant bit (MSB)
+    cmp r9, #1              ; Test if the bit is 1 or 0
+	
+    push {r0-r10} ; Save the current state of Xi, Yi, and color
+	;Explaination
+	;-----
+	;x1 = Xi,
+    ;y1 = Yi,
+    ;x2 = Xi + scaler,
+    ;y2 = Yi + scaler;
+	
+	mov r0, r4 ;x1 = Xi(r4),
+	mov r1, r5 ;y1 = Yi(r5),
+	
+	;x2 = Xi(r0) + scaler(r2),
+	mov r3, r0
+	ADD r3, r2
+	
+	;y2 = Yi(r1) + scaler(r2);
+	mov r4, r1
+	ADD r4, r2
+	
+	; colors in use
+    moveq r10, #BLACK          ; If bit is 0, use BLACK
+    movne r10, #WHITE          ; If bit is 1, use WHITE
+	
+	;X1 = [] r0
+	;Y1 = [] r1
+	;X2 = [] r3
+	;Y2 = [] r4
+	;COLOR = [] r10
+	BL DRAW_RECTANGLE_FILLED
+	pop {r0-r10} ; Restore the previous state of Xi, Yi, and color
+	
+    ADD r4, r2 				; next bit Xi = Xi + scaler
 
-;Width of every number = 20
-;Height of every number = 40
-DRAW_NUMBER_ZERO_SECONDS
-    PUSH {R0-R12,LR}
+    lsl r7, r7, #1          ; Shift the double-word left to prepare for the next bit
+    subs r8, r8, #1         ; Decrement the bit counter
+    bne process_bits        ; Repeat if there are more bits in the current double-word
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+    ; Move to the next double-word in the bitmap after processing 32 bits
+	ADD r3, #4
+	ldr r7, [r3]
+    b infinite_loop               ; Continue if there are more pixels to draw
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6 ;62
-    MOV R1, R7 ; 114  ; X2 = base_x + 120
-    ADD R3, R6, #20   ; Y2 = base_y + 200
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
+; if (Yi >= Ystart + scaler * height)
+end_of_image
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0,R6, #5
-    ADD R1,R7, #10   ; X2 =  base_x + 120
-    ADD R3,R6, #15   ; Y2 = base_y + 200
-	ADD R4,R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-	
-DRAW_NUMBER_ONE
-    PUSH {R0-R12,LR}
-;CLEAR EL PASHA OMAR REDA
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	ADD R0,R6,#25
-    MOV R1, R7
-    ADD R3, R6, #35
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
+	pop {r0-r12, pc}
 	
 
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; r0 = Xstart (top-left X)
+; r1 = Ystart (top-left Y)
+; r2 = scaler -> int
+; r5 = spacing
+DRAW_ALARM
+	push {r0-r12, lr}
+	LDR r3, =A_CHAR
+	BL DRAW_WORD_CHAR
 	
-DRAW_NUMBER_ONE_SECONDS
-    PUSH {R0-R12,LR}
-;CLEAR EL PASHA OMAR REDA
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =L_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	ADD R0,R6, #5
-    MOV R1, R7
-    ADD R3, R6, #15
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
+	LDR r3, =A_CHAR
+	BL DRAW_WORD_CHAR
 
-	
-	
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_TWO
-    PUSH {R0-R12,LR}
+	LDR r3, =R_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =M_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+	
+DRAW_TIMER
+	push {r0-r12, lr}
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =I_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3,R6, #40   ; Y2 = base_y + 200
-	ADD R4,R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #45   ; X2 =  base_x + 120
-    ADD R3, R6, #50   ; Y2 = base_y + 200
-	ADD R4, R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_TWO_SECONDS
-    PUSH {R0-R12,LR}
+	LDR r3, =M_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =E_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =R_CHAR
+	BL DRAW_WORD_CHAR
 	
+	pop {r0-r12, pc}
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3,R6, #10   ; Y2 = base_y + 200
-	ADD R4,R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+DRAW_CLOCK
+	push {r0-r12, lr}
+	LDR r3, =C_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #25   ; X2 =  base_x + 120
-    ADD R3, R6, #30   ; Y2 = base_y + 200
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_THREE
-    PUSH {R0-R12,LR}
+	LDR r3, =L_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =ZERO_DIGIT
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0,R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3, R6, #40   ; Y2 = base_y + 200
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0,R6
-    ADD R1, R7, #45 
-    ADD R3, R6, #40
-	ADD R4, R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_THREE_SECONDS
-    PUSH {R0-R12,LR}
+	LDR r3, =C_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =K_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+	
+	
+DRAW_STOPWATCH
+	push {r0-r12, lr}
+	LDR r3, =S_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0,R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3, R6, #10   ; Y2 = base_y + 200
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0,R6
-    ADD R1, R7, #25 
-    ADD R3, R6, #10
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_FOUR
-    PUSH {R0-R12,LR}
+	LDR r3, =ZERO_DIGIT
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =P_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-	MOV R0, R6
-    MOV R1, R7  
-    ADD R3, R6, #50  
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =W_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    MOV R1, R7
-    ADD R3, R6, #40
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =A_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1,R7, #45   ; X2 =  base_x + 120
-    ADD R3, R6, #40   ; Y2 = base_y + 200
-	ADD R4,R7,#80
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_FOUR_SECONDS
-    PUSH {R0-R12,LR}
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =C_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =H_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+	
+DRAW_SUNDAY
+	push {r0-r12, lr}
+	LDR r3, =S_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =U_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-	MOV R0, R6
-    MOV R1, R7  
-    ADD R3, R6, #20  
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =N_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #5
-    MOV R1, R7
-    ADD R3, R6, #15
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1,R7, #25   ; X2 =  base_x + 120
-    ADD R3, R6, #15   ; Y2 = base_y + 200
-	ADD R4,R7, #40
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	
-		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_FIVE
-    PUSH {R0-R12,LR}
+	pop {r0-r12, pc}
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
+DRAW_MONDAY
+	push {r0-r12, lr}
+	LDR r3, =M_CHAR
+	BL DRAW_WORD_CHAR
 	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #10
-    ADD R3, R6, #50
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #45
-    ADD R3, R6, #40
-	ADD R4, R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_FIVE_SECONDS
-    PUSH {R0-R12,LR}
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =ZERO_DIGIT
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =N_CHAR
+	BL DRAW_WORD_CHAR
 	
+	pop {r0-r12, pc}
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #5
-    ADD R1, R7, #10
-    ADD R3, R6, #20
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+DRAW_TUESDAY
+	push {r0-r12, lr}
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #25
-    ADD R3, R6, #15
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_SIX
-    PUSH {R0-R12,LR}
+	LDR r3, =U_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =E_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+	
+DRAW_WEDNESDAY
+	push {r0-r12, lr}
+	LDR r3, =W_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =E_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =D_CHAR
+	BL DRAW_WORD_CHAR
 	
+	pop {r0-r12, pc}
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3, R6, #50   ; Y2 = base_y + 200
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+DRAW_THURSDAY
+	push {r0-r12, lr}
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6,#10
-    ADD R1, R7, #45   ; X2 =  base_x + 120
-    ADD R3, R6, #40   ; Y2 = base_y + 200
-	ADD R4, R7,#70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_SIX_SECONDS
-    PUSH {R0-R12,LR}
+	LDR r3, =H_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =U_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+	
+DRAW_FRIDAY
+	push {r0-r12, lr}
+	LDR r3, =F_CHAR
+	BL DRAW_WORD_CHAR
+	
+	LDR r3, =R_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Draw the outer rectangle (red in original code, now black)
-	; mov R2,R0    ; X1 = base_x + 50
-	; mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
+	LDR r3, =I_CHAR
+	BL DRAW_WORD_CHAR
 	
+	pop {r0-r12, pc}
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #10   ; X2 =  base_x + 120
-    ADD R3, R6, #20   ; Y2 = base_y + 200
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
+DRAW_SATERDAY
+	push {r0-r12, lr}
+	LDR r3, =S_CHAR
+	BL DRAW_WORD_CHAR
 	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #25   ; X2 =  base_x + 120
-    ADD R3, R6, #15   ; Y2 = base_y + 200
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-    POP {R0-R12,PC}
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DRAW_NUMBER_SEVEN
-    PUSH {R0-R12,LR}
+	LDR r3, =A_CHAR
+	BL DRAW_WORD_CHAR
 
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
+	LDR r3, =T_CHAR
+	BL DRAW_WORD_CHAR
+	
+	pop {r0-r12, pc}
+; r0 = Xstart
+; r2 = scaler
+; r5 = spacing
+DRAW_WORD_CHAR ; this function draws a character then move the position
+	push {lr}
+	MOV R6, #9
+	MOV R11, #12
+	BL DRAW_IMG
+	MOV r4, #9
+	MUL R9, R2, R4      ; R9 = scaler * width (R2 = scaler)
+    ADD R9, R9, R0      ; R9 = Xstart + (scaler * width) (R0 = Xstart)
+    ADD r0, R9, R5       ; (R9 += padding) then put r9 in r0(Xstart)
+	pop {pc}
 
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0,R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #10
-    ADD R3, R6, #40
-	ADD R4, R7, #80
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_SEVEN_SECONDS
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0,R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #5
-    ADD R3, R6, #15
-	ADD R4, R7, #40
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-DRAW_NUMBER_EIGHT
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #10
-    ADD R3, R6, #40
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #45   ; X2 =  base_x + 120
-    ADD R3, R6, #40   ; Y2 = base_y + 200
-	ADD R4, R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_EIGHT_SECONDS
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-	; mov R2,R0    ; X1 = base_x + 50
-	; mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #5
-    ADD R1, R7, #10
-    ADD R3, R6, #15
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #5
-    ADD R1, R7, #25   ; X2 =  base_x + 120
-    ADD R3, R6, #15   ; Y2 = base_y + 200
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_NUMBER_NINE
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #50
-	ADD R4, R7, #80
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #10
-    ADD R1, R7, #10
-    ADD R3, R6, #40
-	ADD R4, R7, #35
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #45
-    ADD R3, R6, #40
-	ADD R4, R7, #70
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-DRAW_NUMBER_NINE_SECONDS
-    PUSH {R0-R12,LR}
-
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-    MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    MOV R10, #BLACK    ; Set color to white
-
-    ; Draw the outer rectangle (red in original code, now black)
-;    mov R2,R0    ; X1 = base_x + 50
-;    mov R3,R1 ; Y1 = base_y + 100
-	MOV R0, R6
-    MOV R1, R7
-    ADD R3, R6, #20
-	ADD R4, R7, #40
-    BL DRAW_RECTANGLE_FILLED
-	
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	ADD R0, R6, #5
-    ADD R1, R7, #10
-    ADD R3, R6, #15
-	ADD R4, R7, #15
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-	MOV R6, r11  ; R0 now has Starting x coordinate
-    MOV R7, r12  ; R1 now has Starting Y coordinate
-    ; Draw the inner rectangle (white in original code, now black)
-	MOV R0, R6
-    ADD R1, R7, #25
-    ADD R3, R6, #15
-	ADD R4, R7, #30
-    MOV R10, #WHITE
-    BL DRAW_RECTANGLE_FILLED
-	
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_BIG_COLON
-    PUSH {R0-R12,LR}
-	;CLEAR EL PASHA OMAR REDA
-	MOV R0, #185
-    MOV R1, #132   ; X2 = base_x + 120
-    MOV R3, #196   ; Y2 = base_y + 200
-	MOV R4, #145
-	MOV R10, #BLACK    ; Set color to white
-    BL DRAW_RECTANGLE_FILLED
-	
-    ; Load base coordinates into R0 (base_x) and R1 (base_y)
-	MOV R0, #185
-    MOV R1, #160   ; X2 = base_x + 120
-    MOV R3, #196   ; Y2 = base_y + 200
-	MOV R4, #173
-	MOV R10, #BLACK    ; Set color to white
-    BL DRAW_RECTANGLE_FILLED
-
-    POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-DRAW_SMALL_COLON
-    PUSH {R0-R12,LR}
-	;CLEAR EL PASHA OMAR REDA
-	MOV R0, #330
-    MOV R1, #181   ; X2 = base_x + 120
-    MOV R3, #341   ; Y2 = base_y + 200
-	MOV R4, #194
-	MOV R10, #BLACK    ; Set color to white
-    BL DRAW_RECTANGLE_FILLED
-	
-    POP {R0-R12,PC}
-	
+; r0 = Xstart (top-left X)
+; r1 = Ystart (top-left Y)
+; r2 = scaler -> int
+; r4 = #DIGIT
+; r5 = spacing (default 4 pixel)
 DISPLAY_NUMBERS
 	PUSH{R0-R12,LR}
-	;R4 gets the value to display
-	;r11 gets the x value
-	;r12 gets the y value
 	
-	mov r11,r6
-	mov r12,r7
+	mov r5, #4
+	
+	; needed by DRAW_IMG
+	MOV R6, #9 ; width of digits
+	MOV R11, #12 ; height of digits
+	
+	LDR r3, =ZERO_DIGIT
 	cmp R4,#0
-	BLEQ DRAW_NUMBER_ZERO
+	BLEQ DRAW_IMG
 	
 	
+	LDR r3, =ONE_DIGIT
 	cmp R4,#1
-	BLEQ DRAW_NUMBER_ONE
+	BLEQ DRAW_IMG
 	
 	
+	LDR r3, =TWO_DIGIT
 	cmp R4,#2
-	BLEQ DRAW_NUMBER_TWO
+	BLEQ DRAW_IMG
 	
+	LDR r3, =THREE_DIGIT
 	cmp R4,#3
-	BLEQ DRAW_NUMBER_THREE
+	BLEQ DRAW_IMG
 	
+	LDR r3, =FOUR_DIGIT
 	cmp R4,#4
-	BLEQ DRAW_NUMBER_FOUR
+	BLEQ DRAW_IMG
 	
+	LDR r3, =FIVE_DIGIT
 	cmp R4,#5
-	BLEQ DRAW_NUMBER_FIVE
+	BLEQ DRAW_IMG
 	
+	LDR r3, =SIX_DIGIT
 	cmp R4,#6
-	BLEQ DRAW_NUMBER_SIX
+	BLEQ DRAW_IMG
 	
+	LDR r3, =SEVEN_DIGIT
 	cmp R4,#7
-	BLEQ DRAW_NUMBER_SEVEN
+	BLEQ DRAW_IMG
 	
+	LDR r3, =EIGHT_DIGIT
 	cmp R4,#8
-	BLEQ DRAW_NUMBER_EIGHT
+	BLEQ DRAW_IMG
 	
+	LDR r3, =NINE_DIGIT
 	cmp R4,#9
-	BLEQ DRAW_NUMBER_NINE
-	
+	BLEQ DRAW_IMG
 
-	
-	POP{R0-R12,PC}
-	
-DISPLAY_NUMBERS_seconds
-	PUSH{R0-R12,LR}
-	;R4 gets the value to display
-	;r6 gets the x value
-	;r7 gets the y value
-	
-	mov r11,r6
-	mov r12,r7
-	cmp R4,#0
-	BLEQ DRAW_NUMBER_ZERO_SECONDS
-	
-	
-	
-	cmp R4,#1
-	BLEQ DRAW_NUMBER_ONE_SECONDS
-	
-	
-	cmp R4,#2
-	BLEQ DRAW_NUMBER_TWO_SECONDS
-	
-	cmp R4,#3
-	BLEQ DRAW_NUMBER_THREE_SECONDS
-	
-	cmp R4,#4
-	BLEQ DRAW_NUMBER_FOUR_SECONDS
-	
-	cmp R4,#5
-	BLEQ DRAW_NUMBER_FIVE_SECONDS
-	
-	cmp R4,#6
-	BLEQ DRAW_NUMBER_SIX_SECONDS
-	
-	cmp R4,#7
-	BLEQ DRAW_NUMBER_SEVEN_SECONDS
-	
-	cmp R4,#8
-	BLEQ DRAW_NUMBER_EIGHT_SECONDS
-	
-	cmp R4,#9
-	BLEQ DRAW_NUMBER_NINE_SECONDS
-	
-
-	
-	POP{R0-R12,PC}
-	
+	POP	{R0-R12,PC}
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
-DISPLAY_REAL_TIME
-	PUSH{R0-R12,LR}
 	
-	LDR R2,=REAL_TIME
-	LDR R1,[R2]
-	
-    ; Calculate minutes (R1 / 60)
-    MOV R2, #60             ; Divisor for minutes
-    UDIV R3, R1, R2         ; R3 = R1 / 60 (total minutes)
-
-    ; Calculate remaining seconds (R1 % 60)
-    MUL R4, R3, R2          ; R4 = R3 * 60 (total seconds in full minutes)
-    SUB R5, R1, R4          ; R5 = R1 - (R3 * 60) (remaining seconds)
-	LDR R6,=PREV_SECS
-	LDR R8,[R6]
-	CMP R5,R8
-	BEQ SKIP_SECONDS
-	STR R5,[R6]
-    ; Extract seconds digits (units and tens)
-    MOV R2, #10             ; Divisor for tens place
-    UDIV R6, R5, R2         ; R6 = R5 / 10 (tens place of seconds)
-	
-	
-	mov r4,r6
-	mov r6,#Fifth_pos_x
-	mov r7,#Starting_pos_y_seconds
-	BL DISPLAY_NUMBERS_seconds
-	
-
-    MUL R7, R4, R2          ; R7 = R6 * 10
-    SUB R8, R5, R7          ; R8 = R5 - R7 (units place of seconds)
-	
-	
-	mov r4,r8
-	mov r6,#Sixth_pos_x
-	mov r7,#Starting_pos_y_seconds
-	BL DISPLAY_NUMBERS_seconds
-
-SKIP_SECONDS
-    ; Calculate hours (R3 / 60)
-    MOV R2, #60             ; Divisor for hours
-    UDIV R9, R3, R2         ; R9 = R3 / 60 (hours)
-
-    ; Calculate remaining minutes (R3 % 60)
-    MUL R10, R9, R2         ; R10 = R9 * 60 (total minutes in full hours)
-    SUB R11, R3, R10        ; R11 = R3 - (R9 * 60) (remaining minutes)
-	
-	LDR R8,=PREV_MINS
-	LDR R6,[R8]
-	CMP R11,R6
-	BEQ SKIP_MINS
-	STR R11,[R8]
-    ; Extract minutes digits (units and tens)
-	MOV R2,#10
-    UDIV R12, R11, R2       ; R12 = R11 / 10 (tens place of minutes)
-	
-	mov r4,r12
-	mov r6,#Third_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-    MUL R8, R12, R2        ; R13 = R12 * 10
-    SUB R10, R11, R8       ; R14 = R11 - R13 (units place of minutes)
-	
-	mov r4,r10
-	mov r6,#Fourth_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-SKIP_MINS
-
-    ; Extract hours digits (units and tens)
-	LDR R8,=PREV_HOURS
-	LDR R6,[R8]
-	CMP R9,R6
-	BEQ SKIP_HOURS
-	STR R11,[R8]
-	
-    UDIV R10, R9, R2        ; R15 = R9 / 10 (tens place of hours)
-	
-	mov r4,r10
-	mov r6,#First_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-    MUL R11, R10, R2        ; R16 = R15 * 10
-    SUB R4, R9, R11        ; R17 = R9 - R16 (units place of hours)
-	
-	
-	mov r6,#Second_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-SKIP_HOURS
-
-	POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-CLOCK_DISPLAY_INIT
-	PUSH{R0-R12,LR}
-	
-	MOV R4,#0
-	mov r6,#First_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-	MOV R4,#0
-	mov r6,#Second_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-	MOV R4,#0
-	mov r6,#Third_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-	MOV R4,#0
-	mov r6,#Fourth_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-	POP{R0-R12,PC}
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DISPLAY_TIMER_TIME
-	PUSH{R0-R12,LR}
-	
-	LDR R2,=TIMER_COUNTDOWN
-	LDR R1,[R2]
-	
-    ; Calculate minutes (R1 / 60)
-    MOV R2, #60             ; Divisor for minutes
-    UDIV R3, R1, R2         ; R3 = R1 / 60 (total minutes)
-
-    ; Calculate remaining seconds (R1 % 60)
-    MUL R4, R3, R2          ; R4 = R3 * 60 (total seconds in full minutes)
-    SUB R5, R1, R4          ; R5 = R1 - (R3 * 60) (remaining seconds)
-;	LDR R6,=PREV_SECS
-;	LDR R8,[R6]
-;	CMP R5,R8
-;	BEQ SKIP_SECONDS_T
-;	STR R5,[R6]
-    ; Extract seconds digits (units and tens)
-    MOV R2, #10             ; Divisor for tens place
-    UDIV R6, R5, R2         ; R6 = R5 / 10 (tens place of seconds)
-	
-	
-	mov r4,r6
-	mov r6,#Fifth_pos_x
-	mov r7,#Starting_pos_y_seconds
-	BL DISPLAY_NUMBERS_seconds
-	
-
-    MUL R7, R4, R2          ; R7 = R6 * 10
-    SUB R8, R5, R7          ; R8 = R5 - R7 (units place of seconds)
-	
-	
-	mov r4,r8
-	mov r6,#Sixth_pos_x
-	mov r7,#Starting_pos_y_seconds
-	BL DISPLAY_NUMBERS_seconds
-
-SKIP_SECONDS_T
-    ; Calculate hours (R3 / 60)
-    MOV R2, #60             ; Divisor for hours
-    UDIV R9, R3, R2         ; R9 = R3 / 60 (hours)
-
-    ; Calculate remaining minutes (R3 % 60)
-    MUL R10, R9, R2         ; R10 = R9 * 60 (total minutes in full hours)
-    SUB R11, R3, R10        ; R11 = R3 - (R9 * 60) (remaining minutes)
-	
-	LDR R8,=PREV_MINS
-	LDR R6,[R8]
-	CMP R11,R6
-	BEQ SKIP_MINS_T
-	STR R11,[R8]
-    ; Extract minutes digits (units and tens)
-	MOV R2,#10
-    UDIV R12, R11, R2       ; R12 = R11 / 10 (tens place of minutes)
-	
-	mov r4,r12
-	mov r6,#Third_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-    MUL R8, R12, R2        ; R13 = R12 * 10
-    SUB R10, R11, R8       ; R14 = R11 - R13 (units place of minutes)
-	
-	mov r4,r10
-	mov r6,#Fourth_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-SKIP_MINS_T
-
-    ; Extract hours digits (units and tens)
-	LDR R8,=PREV_HOURS
-	LDR R6,[R8]
-	CMP R9,R6
-	BEQ SKIP_HOURS_T
-	STR R11,[R8]
-	
-    UDIV R10, R9, R2        ; R15 = R9 / 10 (tens place of hours)
-	
-	mov r4,r10
-	mov r6,#First_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-    MUL R11, R10, R2        ; R16 = R15 * 10
-    SUB R4, R9, R11        ; R17 = R9 - R16 (units place of hours)
-	
-	
-	mov r6,#Second_pos_x
-	mov r7,#Starting_pos_y
-	BL DISPLAY_NUMBERS
-	
-SKIP_HOURS_T
-
-	POP {R0-R12,PC}
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 	END
 		
 		

@@ -13,7 +13,7 @@
 	IMPORT BUTTONS_INIT
 	IMPORT TIMER3_INIT
 	IMPORT TIMER4_INIT
-	INCLUDE Display.s
+	INCLUDE Display2.s
 
     AREA MYCODE, CODE, READONLY
     EXPORT __main
@@ -58,25 +58,45 @@ __main FUNCTION
 	BL TIMER3_INIT
 	bl SETUP
 	
-	LDR R0, =RCC_APB2ENR   ; RCC_APB2ENR Address
-	LDR R1, [R0]
-	ORR R1, R1, #(1 << 3) ; Enable GPIOB clock
-	STR R1, [R0]
-
-	;configure PB9 as output
-	LDR R0, =GPIOB_CRL
-    LDR R1, [R0]
-    BIC R1, R1, #(0xF << 0)     ; Clear PB9 configuration
-    ORR R1, R1, #(0x3 << 0)     ; Configure PB9 as Output, 10MHz
-    STR R1, [R0]
-	
-	
 	mov r0,#0
 	mov r3,#480
 	mov r1,#0
 	mov r4,#320
 	mov r10,#WHITE
 	BL DRAW_RECTANGLE_FILLED
+	
+	mov r0, #25
+	mov r1, #25
+	mov r2, #2
+	mov r5, #4
+	BL DRAW_STOPWATCH
+	
+	
+	
+	BL CLOCK_DISPLAY_INIT
+	
+inf
+	BL DISPLAY_REAL_TIME
+	b inf
+;;	LDR R0, =RCC_APB2ENR   ; RCC_APB2ENR Address
+;;	LDR R1, [R0]
+;;	ORR R1, R1, #(1 << 3) ; Enable GPIOB clock
+;;	STR R1, [R0]
+
+;;	;configure PB9 as output
+;;	LDR R0, =GPIOB_CRL
+;;    LDR R1, [R0]
+;;    BIC R1, R1, #(0xF << 0)     ; Clear PB9 configuration
+;;    ORR R1, R1, #(0x3 << 0)     ; Configure PB9 as Output, 10MHz
+;;    STR R1, [R0]
+;;	
+;;	
+;;	mov r0,#0
+;;	mov r3,#480
+;;	mov r1,#0
+;;	mov r4,#320
+;;	mov r10,#WHITE
+;;	BL DRAW_RECTANGLE_FILLED
 ;	
 	;BL RTC_INIT
 	;bl SETUP
@@ -223,21 +243,21 @@ __main FUNCTION
 	
 	BL CLOCK_DISPLAY_INIT
 	
-Lop1
+;Lop1
 
-	LDR R1,=MODE_SELECT
-	LDR R0, [R1] ;REAL_TIME Variable
-	CMP R0,#0
-	BLEQ DISPLAY_REAL_TIME
+;	LDR R1,=MODE_SELECT
+;	LDR R0, [R1] ;REAL_TIME Variable
+;	CMP R0,#0
+;	BLEQ DISPLAY_REAL_TIME
 
-	CMP R0,#0
-	BLNE DISPLAY_TIMER_TIME
+;	CMP R0,#0
+;	BLNE DISPLAY_TIMER_TIME
     ;Now R6 contains hours, 
 	;R8 contains minutes, 
 	;R5 contains remaining seconds
 	
 	
-	B Lop1
+	;B Lop1
 	
 ;ODR
 ;	LDR R0, =0x40010C0C ;to write 1 on PB0

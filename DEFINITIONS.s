@@ -14,7 +14,7 @@ MODE_SELECT EQU 0X20000024 ; Stores the current mode according to the value 0:CL
 ;FIELD_SELECT EQU 0x20000028 ;Store whether we are incrementing 0:seconds, 1:minutes, 2:hours
 STOPWATCH_TIME EQU 0x20000032 ;store the value of stopwatch
 CONFIG_MODE EQU 0x20000036 ;   0: configuration mode & seconds 1:minutes 2:hours 3:days 4: running mode
-	
+ALARM_VALUE EQU 0x20000040        ;store the value of alarm
 
 
 	

@@ -444,6 +444,11 @@
               <FileType>2</FileType>
               <FilePath>.\Display.s</FilePath>
             </File>
+            <File>
+              <FileName>Display2.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\Display2.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

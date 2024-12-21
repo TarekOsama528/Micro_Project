@@ -290,23 +290,8 @@ TIM1_UP_IRQHandler
 TIM1_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM2_IRQHandler
-;    PUSH {R0-R3, LR}            ; Save working registers
-
-;    ; Clear the Update Interrupt Flag
-;    LDR R0, =0x40000000
-;    LDR R1, [R0, #0x10]         ; Read TIM2_SR
-;    BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
-;    STR R1, [R0, #0x10]
-
-;    ; Toggle LED on PB0
-;    LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
-;    LDR R1, [R0]                ; Read current state
-;    EOR R1, R1, #0x01           ; Toggle PB0 (bit 0)
-;    STR R1, [R0]                ; Write back to GPIOB_ODR
-;	
-;	POP {R0-R3, PC}
 TIM3_IRQHandler
-    PUSH {R0-R3, LR}            ; Save working registers
+    PUSH {R0-R12, LR}            ; Save working registers
 	
 	    ; Clear the Update Interrupt Flag
     LDR R0, =0x40000400
@@ -343,9 +328,9 @@ TIM3_IRQHandler
 	
 	
 END_HANDLER
-	POP {R0-R3, PC}
+	POP {R0-R12, PC}
 TIM4_IRQHandler
-    PUSH {R0-R3, LR}            ; Save working registers
+    PUSH {R0-R12, LR}            ; Save working registers
 
     ; Clear the Update Interrupt Flag
     LDR R0, =0x40000800
@@ -357,26 +342,61 @@ TIM4_IRQHandler
 	LDR R1,[R0]
 	ADD R1,R1,#1
 	
+	
+;	LDR R3, =0x40010C0C       ; GPIOB Output Data Register address
+;    LDR R4, [R3]              ; Read current output state
+;    EOR R4, R4, #(1 << 0)    ; Toggle PB12
+;    STR R4, [R3]              ; Write back to GPIOB_ODR
+	
+
 	LDR R2, =86400    ; Load 86400 into register R2
 	CMP R1, R2        ; Compare R1 with the value in R2
 	MOVEQ R1,#0
 	STR R1,[R0]
 	
-	LDR R0,=0X20000024
+	MOV R5,R1
+	
+	
+	LDR R3,=0x20000040   ;READ ALARM VALUE
+	LDR R4,[R3]
+	CMP R4,R5
+	BNE SKIP_ALARM_ON
+	
+	LDR R0, =0x40010C0C       ; GPIOB_ODR address
+	LDR R1, [R0]
+	ORR R1, R1, #(1 << 0)    ; SET PB0
+	STR R1, [R0]
+	
+	
+	
+	
+	
+SKIP_ALARM_ON
+	LDR R0,=0x20000060  ;CHECK STOPWATCH_ON
 	LDR R1,[R0]
-	CMP R1,#3
-	BNE END_HANDLER2
-	LDR R0,=0x20000036
-	LDR R1,[R0]
-	CMP R1,#1
-	BNE END_HANDLER2
+	CMP R1,#0
+	BEQ SKIP_STOPWATCH
 	LDR R0,=0x20000032
 	LDR R1,[R0]
 	ADD R1,R1,#1
 	STR R1,[R0]
+
+
+
+SKIP_STOPWATCH
+;	LDR R0,=0X20000024
+;	LDR R1,[R0]
+;	CMP R1,#3
+;	BNE END_HANDLER2
+;	LDR R0,=0x20000036
+;	LDR R1,[R0]
+;	CMP R1,#1
+;	BNE END_HANDLER2
+	
+
 	
 END_HANDLER2
-	POP {R0-R3, PC}
+	POP {R0-R12, PC}
 I2C1_EV_IRQHandler
 I2C1_ER_IRQHandler
 I2C2_EV_IRQHandler

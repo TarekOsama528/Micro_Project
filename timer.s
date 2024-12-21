@@ -89,7 +89,8 @@ TIMER3_INIT
     STR R1, [R0]           ; Write back to TIM3_DIER
 	
 	LDR R0, =NVIC_ISER0    ; Address of NVIC_ISER0
-	MOV R1, #(1 << 29)     ; TIM3 IRQ is bit 29
+	LDR R1,[R0]
+	ORR R1,R1, #(1 << 29)     ; TIM3 IRQ is bit 29
 	STR R1, [R0]           ; Enable TIM3 interrupt
 
     ; Start the Timer
@@ -127,7 +128,8 @@ TIMER4_INIT
     STR R1, [R0]           ; Write back to TIM4_DIER
 	
 	LDR R0, =NVIC_ISER0    ; Address of NVIC_ISER0
-	MOV R1, #(1 << 30)     ; TIM4 IRQ is bit 30
+	LDR R1,[R0]
+	ORR R1,R1, #(1 << 30)     ; TIM4 IRQ is bit 30
 	STR R1, [R0]           ; Enable TIM4 interrupt
 
     ; Start the Timer

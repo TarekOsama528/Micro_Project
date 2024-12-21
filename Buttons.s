@@ -3,7 +3,7 @@
 	AREA MYCODE,CODE,READONLY
 		;EXPORT EXTI4_IRQHandler
 		EXPORT BUTTONS_INIT
-		EXPORT CONFIG_TIME
+		;EXPORT CONFIG_TIME
 		
 		
 MODE_init
@@ -102,6 +102,23 @@ CONFIG_init
 	STR R1,[R0]
 	
 	POP {R0-R12, PC}
+	
+MINUTES_HOURS_init
+	PUSH {R0-R12, LR}
+	
+		; Configure PB7 as input with pull-up
+	LDR R0, =GPIOB_CRL       ; GPIOB_CRL address
+	LDR R1, [R0]              ; Read current value
+	BIC R1, R1, #(0xF << 28)  ; Clear PB7 bits
+	ORR R1, R1, #(0x1 << 31)  ; Set PB7 as input with pull-up/down
+	STR R1, [R0]              ; Write back
+	
+	LDR R0,=GPIOB_ODR
+	LDR R1,[R0]
+	ORR R1,#(1<<7) ;Configure it as PUll_up
+	STR R1,[R0]
+	
+	POP {R0-R12, PC}
 
 
 BUTTONS_INIT
@@ -113,102 +130,104 @@ BUTTONS_INIT
 	
 	BL CONFIG_init
 	
+	BL MINUTES_HOURS_init
+	
 	POP {R0-R12, PC}
 	
-CONFIG_TIME
-	PUSH {R0-R12, LR}
-	
-MAIN_LOOP
-	LDR R0,=GPIOB_IDR
-	LDR R1,[R0]
-	TST R1,#(0<<5)   ;check if we pressed INCREMENT button PB5 (PULL_UP)
-	BNE LOOP_END
-	
+;CONFIG_TIME
+;	PUSH {R0-R12, LR}
+;	
+;MAIN_LOOP
+;	LDR R0,=GPIOB_IDR
+;	LDR R1,[R0]
+;	TST R1,#(0<<5)   ;check if we pressed INCREMENT button PB5 (PULL_UP)
+;	BNE LOOP_END
+;	
 
-	LDR R0,=MODE_SELECT
-	LDR R1,[R0]
-	CMP R1,#0      ;check if we are in clock mode
-	BNE NEXT_ALARM
-	                     ;CONFIURE CLOCK
-	LDR R0,=CONFIG_MODE
-	LDR R1,[R0]
-	CMP R1,#0            ;SECONDS CONFIGURATION (DON'T EDIT R1)
-	BNE CLOCK_MINUTES_CONFIG
-	LDR R0,=REAL_TIME
-	LDR R3,[R0]
-	ADD R3,R3,#1
-	STR R3,[R0]
-	BL DISPLAY_REAL_TIME
-	
-CLOCK_MINUTES_CONFIG
-	CMP R1,#1           ;MINUTES CONFIGURATION (DON'T EDIT R1)
-	BNE CLOCK_HOURS_CONFIG
-	LDR R0,=REAL_TIME
-	LDR R3,[R0]
-	ADD R3,R3,#60
-	STR R3,[R0]
-	BL DISPLAY_REAL_TIME
-	
-CLOCK_HOURS_CONFIG
-	CMP R1,#2           ;HOURS CONFIGURATION (DON'T EDIT R1)
-	BNE CLOCK_DAYS_CONFIG
-	LDR R0,=REAL_TIME
-	LDR R3,[R0]
-	ADD R3,R3,#3600
-	STR R3,[R0]
-	BL DISPLAY_REAL_TIME
-	
-CLOCK_DAYS_CONFIG
-	CMP R1,#3           ;DAYS CONFIGURATION (DON'T EDIT R1)
-	BNE CLOCK_RUN
-	LDR R0,=WEEK_DAY
-	LDR R3,[R0]
-	ADD R3,R3,#1
-	STR R3,[R0]
-	BL DISPLAY_REAL_TIME
-	
-CLOCK_RUN
-	CMP R1,#4            ;if running mode 
-	BEQ END_FUNC
-	B LOOP_END
-	
-NEXT_ALARM    ;CONIFURE ALARM
-	CMP R1,#1   ;check if we are in alarm mode
-	BNE NEXT_TIMER
-	
-	CMP R1,#3            ;if DAYS
-	BNE LOOP_END
-	MOV R1,#4            ;SWITCH IT TO RUNNING MODE
-	LDR R0,=CONFIG_MODE
-	STR R1,[R0]
-	B END_FUNC
-	
-	
-NEXT_TIMER         ;the remaining mode is timer (CONFIGURE TIMER)
-	
+;	LDR R0,=MODE_SELECT
+;	LDR R1,[R0]
+;	CMP R1,#0      ;check if we are in clock mode
+;	BNE NEXT_ALARM
+;	                     ;CONFIURE CLOCK
+;	LDR R0,=CONFIG_MODE
+;	LDR R1,[R0]
+;	CMP R1,#0            ;SECONDS CONFIGURATION (DON'T EDIT R1)
+;	BNE CLOCK_MINUTES_CONFIG
+;	LDR R0,=REAL_TIME
+;	LDR R3,[R0]
+;	ADD R3,R3,#1
+;	STR R3,[R0]
+;	BL DISPLAY_REAL_TIME
+;	
+;CLOCK_MINUTES_CONFIG
+;	CMP R1,#1           ;MINUTES CONFIGURATION (DON'T EDIT R1)
+;	BNE CLOCK_HOURS_CONFIG
+;	LDR R0,=REAL_TIME
+;	LDR R3,[R0]
+;	ADD R3,R3,#60
+;	STR R3,[R0]
+;	BL DISPLAY_REAL_TIME
+;	
+;CLOCK_HOURS_CONFIG
+;	CMP R1,#2           ;HOURS CONFIGURATION (DON'T EDIT R1)
+;	BNE CLOCK_DAYS_CONFIG
+;	LDR R0,=REAL_TIME
+;	LDR R3,[R0]
+;	ADD R3,R3,#3600
+;	STR R3,[R0]
+;	BL DISPLAY_REAL_TIME
+;	
+;CLOCK_DAYS_CONFIG
+;	CMP R1,#3           ;DAYS CONFIGURATION (DON'T EDIT R1)
+;	BNE CLOCK_RUN
+;	LDR R0,=WEEK_DAY
+;	LDR R3,[R0]
+;	ADD R3,R3,#1
+;	STR R3,[R0]
+;	BL DISPLAY_REAL_TIME
+;	
+;CLOCK_RUN
+;	CMP R1,#4            ;if running mode 
+;	BEQ END_FUNC
+;	B LOOP_END
+;	
+;NEXT_ALARM    ;CONIFURE ALARM
+;	CMP R1,#1   ;check if we are in alarm mode
+;	BNE NEXT_TIMER
+;	
+;	CMP R1,#3            ;if DAYS
+;	BNE LOOP_END
+;	MOV R1,#4            ;SWITCH IT TO RUNNING MODE
+;	LDR R0,=CONFIG_MODE
+;	STR R1,[R0]
+;	B END_FUNC
+;	
+;	
+;NEXT_TIMER         ;the remaining mode is timer (CONFIGURE TIMER)
+;	
 
-	CMP R1,#3            ;if DAYS
-	BNE LOOP_END
-	MOV R1,#4            ;SWITCH IT TO RUNNING MODE
-	LDR R0,=CONFIG_MODE
-	STR R1,[R0]
-	B END_FUNC
-	
+;	CMP R1,#3            ;if DAYS
+;	BNE LOOP_END
+;	MOV R1,#4            ;SWITCH IT TO RUNNING MODE
+;	LDR R0,=CONFIG_MODE
+;	STR R1,[R0]
+;	B END_FUNC
+;	
 
-LOOP_END
-	LDR R0,=GPIOB_IDR
-	LDR R1,[R0]
-	TST R1,#(0<<6)   ;check if we pressed CONFIG button PB6 (PULL_UP)
-	BNE MAIN_LOOP
-	
-	LDR R0,=CONFIG_MODE   ;CONFIG_MODE check
-	LDR R1,[R0]
-	ADD R1,R1,#1
-	STR R1,[R0]
-	
-	B MAIN_LOOP
-	
-END_FUNC
-	POP {R0-R12, PC}
+;LOOP_END
+;	LDR R0,=GPIOB_IDR
+;	LDR R1,[R0]
+;	TST R1,#(0<<6)   ;check if we pressed CONFIG button PB6 (PULL_UP)
+;	BNE MAIN_LOOP
+;	
+;	LDR R0,=CONFIG_MODE   ;CONFIG_MODE check
+;	LDR R1,[R0]
+;	ADD R1,R1,#1
+;	STR R1,[R0]
+;	
+;	B MAIN_LOOP
+;	
+;END_FUNC
+;	POP {R0-R12, PC}
 	
 	END

@@ -4,11 +4,11 @@
 		
 DHT11_READ
     PUSH {R0-R7, LR}             ; Save working registers
-	; Enable clock for GPIOB
-	LDR R0, =RCC_APB2ENR   ; RCC_APB2ENR Address
-	LDR R1, [R0]
-	ORR R1, R1, #(1 << 3) ; Enable GPIOB clock
-	STR R1, [R0]
+;	; Enable clock for GPIOB
+;	LDR R0, =RCC_APB2ENR   ; RCC_APB2ENR Address
+;	LDR R1, [R0]
+;	ORR R1, R1, #(1 << 3) ; Enable GPIOB clock
+;	STR R1, [R0]
 
 	;configure PB9 as output
 	LDR R0, =GPIOB_CRH
@@ -122,8 +122,10 @@ zero
     ORR R8, R8, R4               ; Combine with existing data in R8
     ADD R7, R7, #8               ; Increment position for the next byte
     SUBS R6, R6, #1              ; Decrement total byte counter
+
 	
     BNE READ_BYTE_LOOP          ; Repeat for all 5 bytes
+	
 	
 
     POP {R0-R7, PC}
@@ -148,7 +150,7 @@ WAIT_LOOP
 	
 EXIT
     POP {R0-R5, PC}              ; Restore registers and return
-
+	
 	
 	END
 

@@ -1,6 +1,11 @@
 	INCLUDE Display.s
 	IMPORT DHT11_READ
 	AREA MYCODE, CODE, READONLY
+		
+		
+		
+		
+
 DISPLAY_REAL_TIME
 	PUSH{R0-R12,LR}
 	
@@ -103,6 +108,10 @@ SKIP_MINS
 	BL DISPLAY_NUMBERS
 	
 SKIP_HOURS
+	
+;	LDR R7, =WEEK_DAY
+;	LDR R8,[R7]
+;	BL DISPLAY_WEEK_DAY
 
 	POP {R0-R12,PC}
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

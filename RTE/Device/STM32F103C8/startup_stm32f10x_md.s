@@ -299,14 +299,19 @@ TIM3_IRQHandler
     BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
     STR R1, [R0, #0x10]
 	
-
+	LDR R0,=0x20000072    ;CHECK TIMER_CONFIGURED
+	LDR R1,[R0]
+	CMP R1,#0
+	BEQ END_HANDLER
 	
-	LDR R0,=0x20000020
+	LDR R0,=0x20000020 ; TIMER_COUNTDOWN
 	LDR R1,[R0]
 	SUB R1,R1,#1
 	STR R1,[R0]
+
 	CMP R1,#0
 	BNE END_HANDLER
+	
 
     ;TURN ON on PB0 (BUZZER)
     LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
@@ -314,12 +319,7 @@ TIM3_IRQHandler
     ORR R1, R1, #0x01           ; TURN ON PB0 (bit 0)
     STR R1, [R0]                ; Write back to GPIOB_ODR
 	
-	    ; Enable TIM4 Clock in RCC_APB1ENR
-;    LDR R0, =0x4002101C          ; RCC_APB1ENR address
-;    LDR R1, [R0]                  ; Read current value
-;    BIC R1, R1, #0x04             ; Set bit 0 to enable TIM4 clock
-;    STR R1, [R0] 
-	
+
 	; Start the Timer
     LDR R0, =0x40000400            ; Base address of TIM3
 	LDR R1, [R0]           ; Read TIM3_CR1 (Control Register 1)

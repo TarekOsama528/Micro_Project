@@ -171,12 +171,12 @@ __main FUNCTION
 	
 
 
-Lop1
+MAIN_PROGRAM
 
 	BL UPDATE_Temp_Humidity
 	BL UPDATE_Modes
 	
-	B Lop1
+	B MAIN_PROGRAM
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    

@@ -3,7 +3,7 @@
 	AREA MYDATA, DATA, READONLY
 
 ; here we store out variables used across the code as registers could get messed up
-; all are 4BYTES9
+; all are 4 BYTES
 REAL_TIME EQU 0x20000000 ; this variable stores the real time in seconds 4BYTES
 PREV_HOURS EQU 0X20000004 ;PREVIOUS HOURS 
 PREV_MINS EQU 0x20000008	;PREVIOUS MINIUTES

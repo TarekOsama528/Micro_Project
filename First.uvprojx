@@ -385,11 +385,6 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
-              <FileName>Output.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\Output.s</FilePath>
-            </File>
-            <File>
               <FileName>source.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\source.s</FilePath>

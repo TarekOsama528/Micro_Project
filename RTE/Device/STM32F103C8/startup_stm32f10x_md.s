@@ -236,42 +236,10 @@ RTC_IRQHandler
 FLASH_IRQHandler
 RCC_IRQHandler
 EXTI0_IRQHandler
-	PUSH {R0-R3, LR}            ; Save registers
-    LDR R0, =0x40010414            ; EXTI_PR address
-    LDR R1, [R0]
-    ORR R1, R1, #(1 << 0)       ; Clear EXTI0 pending flag
-    STR R1, [R0]                ; Write back
-
-    ; Toggle PA1
-    LDR R0, =0x4001080C          ; GPIOA_ODR address
-    LDR R1, [R0]
-    EOR R1, R1, #(1 << 1)       ; Toggle PA1
-    STR R1, [R0]                ; Write back
-    POP {R0-R3, PC}             ; Restore registers and return
 EXTI1_IRQHandler
 EXTI2_IRQHandler
 EXTI3_IRQHandler
 ;EXTI4_IRQHandler
-;    PUSH {R0-R3, LR}              ; Save registers and return address
-
-;;==================================================================================
-;; Check if the interrupt is caused by PB4 (EXTI4)
-;               ; If not, exit handler
-
-;; Clear the interrupt flag for PB4 (EXTI4)
-;    LDR R0, =0x40010414              ; EXTI_PR address
-;    MOV R1, #(1 << 4)             ; Prepare mask for EXTI4
-;    STR R1, [R0]                  ; Clear EXTI4 interrupt flag by writing 1
-
-;; Handle PB4 (Sensor logic or other tasks)
-;    ; Custom logic for PB0 (sensor logic or toggling output pin, etc.)
-;    LDR R0, =0x40010C0C            ; GPIOB_ODR address (Output Data Register)
-;    LDR R1, [R0]                  ; Read current GPIOB_ODR value
-;    EOR R1, R1, #(1 << 0)         ; Toggle PB0 (just as an example)
-;    STR R1, [R0]                  ; Write back to GPIOB_ODR
-
-;;==================================================================================sx         
-;    POP {R0-R3, PC}
 DMA1_Channel1_IRQHandler
 DMA1_Channel2_IRQHandler
 DMA1_Channel3_IRQHandler
@@ -384,16 +352,6 @@ SKIP_ALARM_ON
 
 
 SKIP_STOPWATCH
-;	LDR R0,=0X20000024
-;	LDR R1,[R0]
-;	CMP R1,#3
-;	BNE END_HANDLER2
-;	LDR R0,=0x20000036
-;	LDR R1,[R0]
-;	CMP R1,#1
-;	BNE END_HANDLER2
-	
-
 	
 END_HANDLER2
 	POP {R0-R12, PC}
@@ -422,28 +380,7 @@ EXTI15_10_IRQHandler
     STR R4, [R3]              ; Write back to GPIOB_ODR
 
     POP {R0, R12, PC}
-    ;BX LR                     ; Return from interrupt
-
-;END_HANDLER
-	;BX LR                    ; Return from interrupt
-
-	;POP {R0-R12, PC}
 RTCAlarm_IRQHandler
-;	PUSH {R0-R12, LR}
-;	
-
-;	LDR R0, =0x40002804           ; Address of RTC_CRL
-;    LDR R1, [R0]
-;    BIC R1, R1, #0x02            ; Clear ALRF bit (bit 1)
-;    STR R1, [R0]                 ; Write back to RTC_CRL
-;	
-;	LDR R0, =0x40010C0C ;to write 1 on PB0
-;	LDR R1,[R0]
-;	ORR R1,R1,#0x01
-;	STR R1,[R0]
-;	
-;	
-;	POP {R0-R12, PC}
 USBWakeUp_IRQHandler
 
                 B       .

@@ -144,6 +144,31 @@ __main FUNCTION
 	BL DRAW_RECTANGLE_FILLED
 	
 	
+	mov r0, #93
+	mov r1, #260
+	mov r2, #2
+	mov r6, #25
+	mov r11, #25
+	LDR r3, =celsius_25
+	BL DRAW_IMG
+	
+	mov r0, #420
+	mov r1, #270
+	mov r2, #2
+	mov r6, #26
+	mov r11, #20
+	LDR r3, =percentage
+	BL DRAW_IMG
+	
+	
+	mov r0, #240
+	mov r1, #(25)
+	mov r2, #1
+	mov r6, #25
+	mov r11, #25
+	LDR r3, =CLOCK_ICON
+	BL DRAW_IMG
+	
 	BL CLOCK_DISPLAY_INIT
 	
 ;	mov r0, #25
@@ -153,13 +178,13 @@ __main FUNCTION
 ;	BL DRAW_CLOCK
 	
 	mov r0, #25
-	mov r1, #210
+	mov r1, #230
 	mov r2, #2
 	mov r5, #4
 	BL DRAW_TEMP
 	
-	mov r0, #240
-	mov r1, #210
+	mov r0, #360
+	mov r1, #230
 	mov r2, #2
 	mov r5, #4
 	BL DRAW_HUM

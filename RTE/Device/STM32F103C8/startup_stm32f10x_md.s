@@ -321,6 +321,13 @@ TIM4_IRQHandler
 	CMP R1, R2        ; Compare R1 with the value in R2
 	MOVEQ R1,#0
 	STR R1,[R0]
+	LDR R7,=0x20000016
+	LDR R8,[R7]
+	CMP R1,#0
+	ADDEQ R8,R8,#1
+	CMP R8,#7
+	MOVEQ R8,#0
+	STR R8,[R7]
 	
 	MOV R5,R1
 	

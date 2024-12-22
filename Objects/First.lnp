@@ -1,5 +1,4 @@
 --cpu Cortex-M3
-".\objects\output.o"
 ".\objects\source.o"
 ".\objects\tft.o"
 ".\objects\definitions.o"

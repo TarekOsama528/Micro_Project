@@ -10,7 +10,13 @@ EXTI4_IRQHandler
 	LDR R1, [R0]
 	ORR R1, R1, #(1 << 4)     ; Clear EXTI4 pending flag
 	STR R1, [R0]
-
+	
+;BUSY1
+;	LDR R0, =0x40010C08
+;	LDR R1,[R0]
+;	TST R1,#(1 << 4)
+;	BNE BUSY1 
+	
 	; Toggle PB0
 	LDR R0, =0x40010C0C       ; GPIOB_ODR address
 	LDR R1, [R0]

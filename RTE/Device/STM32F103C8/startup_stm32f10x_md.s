@@ -32,6 +32,8 @@
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
+	INCLUDE TFT.s
+
 Stack_Size      EQU     0x00000400
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -279,8 +281,14 @@ TIM3_IRQHandler
 
 	CMP R1,#0
 	BNE END_HANDLER
-	
+	LDR R4,=86400
+	CMP R1,R4
+	BLO BUZZER_ON
+	MOV R1,#0
+	STR R1,[R0]
+	B END_HANDLER
 
+BUZZER_ON
     ;TURN ON on PB0 (BUZZER)
     LDR R0, =(0x40010C0C)          ; GPIOB Output Data Register
     LDR R1, [R0]                ; Read current state
@@ -342,7 +350,10 @@ TIM4_IRQHandler
 	ORR R1, R1, #(1 << 0)    ; SET PB0
 	STR R1, [R0]
 	
-	
+	LDR R0, =0x20000068
+	LDR R1,[R0]
+	MOV R1,#0
+	STR R1,[R0]
 	
 	
 	
@@ -379,11 +390,28 @@ EXTI15_10_IRQHandler
     LDR R0, =0x40010414       ; EXTI Pending Register address
     MOV R1, #(1 << 13)        ; Prepare mask for EXTI13
     STR R1, [R0]              ; Clear the EXTI13 pending flag
-
+	
+	LDR R0,=INVERTED_CHECK
+	LDR R1,[R0]
+	CMP R1,#1
+	BNE INVERT_OFF
+	MOV R1,#0
+	STR R1,[R0]
+	MOV R2,#0x21
+	BL LCD_COMMAND_WRITE
+	B INVERT_ON
+	
+INVERT_OFF
+	MOV R1,#1
+	STR R1,[R0]
+	MOV R2,#0x20
+	BL LCD_COMMAND_WRITE
+	
+INVERT_ON
     ; Turn OFF PB0 (BUZZER)
     LDR R3, =0x40010C0C       ; GPIOB Output Data Register address
     LDR R4, [R3]              ; Read current output state
-    BIC R4, R4, #(1 << 0)    ; Toggle PB12
+    BIC R4, R4, #(1 << 0)    ; TURN OFF PB0
     STR R4, [R3]              ; Write back to GPIOB_ODR
 
     POP {R0, R12, PC}

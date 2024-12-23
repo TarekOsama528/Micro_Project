@@ -18,10 +18,10 @@ EXTI4_IRQHandler
 ;	BNE BUSY1 
 	
 	; Toggle PB0
-	LDR R0, =0x40010C0C       ; GPIOB_ODR address
-	LDR R1, [R0]
-	EOR R1, R1, #(1 << 0)    ; Toggle PB0
-	STR R1, [R0]
+;	LDR R0, =0x40010C0C       ; GPIOB_ODR address
+;	LDR R1, [R0]
+;	EOR R1, R1, #(1 << 0)    ; Toggle PB0
+;	STR R1, [R0]
 	
 	LDR R0,=0x20000036 ;CONFIG_MODE
 	LDR R1,[R0]

@@ -81,6 +81,7 @@ DISPLAY_NORMAL
 ALARM_MODE 
 	PUSH{R0-R12,LR}
 	
+	
 	LDR R3, =ALARM_CONFIGURED
 	LDR R4,[R3]
 	
@@ -167,10 +168,10 @@ END_LOOP
 	BNE NO_CHANGE
 	
 	
-	LDR R0, =0x40010C0C       ; GPIOB_ODR address
-	LDR R1, [R0]
-	EOR R1, R1, #(1 << 0)    ; Toggle PB0
-	STR R1, [R0]
+;	LDR R0, =0x40010C0C       ; GPIOB_ODR address
+;	LDR R1, [R0]
+;	EOR R1, R1, #(1 << 0)    ; Toggle PB0
+;	STR R1, [R0]
 	
 	;TOGGLE STOPWATCH_ON
 	
@@ -217,6 +218,26 @@ FINISH_LOOP
 
 CONFIG_CLOCK
 	PUSH {R0-R12,LR}
+	
+		
+	mov r0, #220
+	mov r1, #240
+	mov r2, #2
+	mov r6, #24
+	mov r11, #24
+	LDR r3, =GEAR
+	BL DRAW_IMG
+	
+	
+	LDR R0,=MINS_HOURS_LAST
+	MOV R1,#0
+	STR R1,[R0]
+	
+LOOOP_NOT_PRESSED
+	LDR R0,=MINS_HOURS_LAST
+	MOV R1,#0
+	STR R1,[R0]
+	
 LOOOP
 
 	LDR R0,=GPIOB_IDR
@@ -245,13 +266,22 @@ LOOP2
 	BHI NEXT_DAY
 	;LDR R2, =REAL_TIME
 	;BL DISPLAY_REAL_TIME
-	
 CHECK_HOURS
 	; Check if PB7 is pressed
     LDR R0, =GPIOB_IDR
     LDR R1, [R0]
     TST R1, #(1 << 7)   ; Check if PB5 is pressed
-    BNE LOOOP          ; Wait until PB5 is pressed
+    BNE LOOOP_NOT_PRESSED          ; Wait until PB5 is pressed
+	
+	LDR R0,=MINS_HOURS_LAST
+	LDR R1,[R0]
+	CMP R1,#1
+	BEQ LOOOP
+	
+	LDR R0,=MINS_HOURS_LAST
+	LDR R1,[R0]
+	MOV R1,#1
+	STR R1,[R0]
 	
 	LDR R0,=REAL_TIME
 	LDR R1,[R0]
@@ -288,6 +318,12 @@ END_LOOOP
 	MOV R1,#1
 	STR R1,[R0]
 	
+	mov r0,#220
+	mov r3,#268
+	mov r1,#240
+	mov r4,#288
+	mov r10,#WHITE
+	BL DRAW_RECTANGLE_FILLED
 	
 	POP {R0-R12,PC}
 
@@ -296,6 +332,15 @@ END_LOOOP
 		
 CONFIG_ALARM
 	PUSH {R0-R12,LR}
+		
+	mov r0, #220
+	mov r1, #240
+	mov r2, #2
+	mov r6, #24
+	mov r11, #24
+	LDR r3, =GEAR
+	BL DRAW_IMG
+	
 LOOOPA
 
 	LDR R0,=GPIOB_IDR
@@ -365,6 +410,12 @@ END_LOOOPA
 	MOV R1,#1
 	STR R1,[R0]
 	
+	mov r0,#220
+	mov r3,#268
+	mov r1,#240
+	mov r4,#288
+	mov r10,#WHITE
+	BL DRAW_RECTANGLE_FILLED
 	
 	POP {R0-R12,PC}
 	
@@ -372,8 +423,21 @@ CONFIG_TIMER
 	
 	PUSH {R0-R12,LR}
 	
+		
+	mov r0, #220
+	mov r1, #240
+	mov r2, #2
+	mov r6, #24
+	mov r11, #24
+	LDR r3, =GEAR
+	BL DRAW_IMG
+	
 	
 	BL CLOCK_DISPLAY_INIT
+	
+	LDR R0,=SECONDS_MINS_LAST
+	MOV R1,#0
+	LDR R1,[R0]
 	
 	
 LOOOPT
@@ -381,12 +445,24 @@ LOOOPT
 	LDR R0,=GPIOB_IDR
 	LDR R1,[R0]
 	TST R1, #(1 << 6)   ; Check if PB6 is pressed
-	BNE LOOP2T
+	BNE LOOOP2T_NOT_PRESSED          ; BRANCH IF NOT PRESSED
+	
+	LDR R0,=MINS_HOURS_LAST
+	LDR R1,[R0]
+	CMP R1,#1
+	BEQ LOOP2T
+	
 	LDR R0,=TIMER_CONFIGURED
 	LDR R1,[R0]
 	MOV R1,#1
 	STR R1,[R0]
 	B END_LOOOPT
+	
+LOOOP2T_NOT_PRESSED
+
+	LDR R0,=SECONDS_MINS_LAST
+	MOV R1,#0
+	LDR R1,[R0]
 	
 LOOP2T	
     ; Check if PB5 is pressed
@@ -403,10 +479,7 @@ LOOP2T
 	CMP R1,R11
 	BLO SAME_DAYT
 	B NEXT_DAYT
-	;BLO SAME_DAYT
-	;BHI NEXT_DAYT
-	;LDR R2, =REAL_TIME
-	;BL DISPLAY_REAL_TIME
+
 	
 CHECK_MINUTEST
 	; Check if PB7 is pressed
@@ -449,6 +522,15 @@ END_LOOOPT
 	MOV R1,#1
 	STR R1,[R0]
 	BL TIMER3_INIT
+	
+	mov r0,#220
+	mov r3,#268
+	mov r1,#240
+	mov r4,#288
+	mov r10,#WHITE
+	BL DRAW_RECTANGLE_FILLED
+	
+	
 	POP {R0-R12,PC}
 	
 

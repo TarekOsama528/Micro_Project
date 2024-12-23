@@ -45,8 +45,41 @@ DISPLAY_WEEK_DAY
 DISPLAY_REAL_TIME
 	PUSH{R0-R12,LR}
 	
+	MOV R12,R2
+	
+;	LDR R0,=REAL_TIME
+;	LDR R1,[R0]
+;	LDR R3,=43200
+;	CMP R1,R3
+;	BLO DISPLAY_SUN
+;	
+;	mov r0, #330
+;	mov r1, #15
+;	mov r2, #2
+;	mov r6, #25
+;	mov r11, #25
+;	LDR r3, =MOON
+;	BL DRAW_IMG
+;	
+;	B END_DAY_NIGHT
+;		
+;DISPLAY_SUN
+;	mov r0, #330
+;	mov r1, #15
+;	mov r2, #2
+;	mov r6, #25
+;	mov r11, #25
+;	LDR r3, =SUN
+;	BL DRAW_IMG
+;	
+;	B END_DAY_NIGHT
+;	
+
+;END_DAY_NIGHT
+	
 	mov R12,R2
 	LDR R1,[R12]
+	
 	
     ; Calculate minutes (R1 / 60)
     MOV R2, #60             ; Divisor for minutes

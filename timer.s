@@ -22,10 +22,10 @@ TIMER2_INIT
 	ORR R1,R1,#0x01
 	STR R1,[R0]
 	
-	LDR R0, =0x40010C0C         ; GPIOB Output Data Register
-    LDR R1, [R0]                ; Read current state
-    ORR R1, R1, #0x01           ; Turn on the LED PB0 (bit 0)
-    STR R1, [R0] 
+;	LDR R0, =0x40010C0C         ; GPIOB Output Data Register
+;    LDR R1, [R0]                ; Read current state
+;    ORR R1, R1, #0x01           ; Turn on the LED PB0 (bit 0)
+;    STR R1, [R0] 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ; Enable TIM2 Clock in RCC_APB1ENR

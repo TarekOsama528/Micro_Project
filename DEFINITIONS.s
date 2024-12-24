@@ -10,10 +10,10 @@ PREV_MINS EQU 0x20000008	;PREVIOUS MINIUTES
 PREV_SECS EQU 0x20000012 ; PREVIOUS SECONDS
 WEEK_DAY EQU  0x20000016 ; TRACKS THE WEEK DAY 0-SAT 6-FRI
 TIMER_COUNTDOWN EQU 0x20000020 ; THE CURRENT VALUE OF THE TIMER (REAL TIMER MODE)
-MODE_SELECT EQU 0X20000024 ; Stores the current mode according to the value 0:CLOCK 1:ALARM 2:TIMER 3:STOPWATCH
-;FIELD_SELECT EQU 0x20000028 ;Store whether we are incrementing 0:seconds, 1:minutes, 2:hours
-STOPWATCH_TIME EQU 0x20000032 ;store the value of stopwatch
-CONFIG_MODE EQU 0x20000036 ;   0: configuration mode & seconds 1:minutes 2:hours 3:days 4: running mode
+MODE_SELECT EQU 0X20000024        ;Stores the current mode according to the value 0:CLOCK 1:ALARM 2:TIMER 3:STOPWATCH
+;FIELD_SELECT EQU 0x20000028      ;Store whether we are incrementing 0:seconds, 1:minutes, 2:hours
+STOPWATCH_TIME EQU 0x20000032        ;store the value of stopwatch
+CONFIG_MODE EQU 0x20000036   ; 0: configuration mode & seconds & Minutes 1: running mode
 ALARM_VALUE EQU 0x20000040        ;store the value of alarm
 CURRENT_TEMP EQU 0x20000044       ;stores the current value of the temprature
 CURRENT_HUM  EQU 0x20000048

@@ -23,18 +23,6 @@ MODE_init
 	ORR R1, R1, #(0x8 << 16)  ; Set PB4 as input with pull-up/down
 	STR R1, [R0]              ; Write back
 
-;	; Configure PB13 as output
-;	LDR R0, =0x40010C04       ; GPIOB_CRH address
-;	LDR R1, [R0]              ; Read current value
-;	BIC R1, R1, #(0xF << 20)  ; Clear PB13 bits
-;	ORR R1, R1, #(0x2 << 20)  ; Set PB13 as output, push-pull, 2MHz
-;	STR R1, [R0]              ; Write back
-	
-;	; Configure PB14 as output
-;	LDR R1, [R0]              ; Read current value again
-;	BIC R1, R1, #(0xF << 24)  ; Clear PB14 bits
-;	ORR R1, R1, #(0x2 << 24)  ; Set PB14 as output, push-pull, 2MHz
-;	STR R1, [R0]              ; Write back
 
 	; Map PB4 to EXTI4
 	LDR R0, =0x4001000C       ; AFIO_EXTICR2 address (EXTI4 is in EXTI_CR2)

@@ -314,10 +314,16 @@ TIM4_IRQHandler
     BIC R1, R1, #0x01           ; Clear UIF (Update Interrupt Flag, bit 0)
     STR R1, [R0, #0x10]
 	
+	
+	LDR R0,=0x20000064       ;CLOCK_CONFIGURED
+	LDR R1,[R0]
+	CMP R1,#1            ;IF NOT 1:CONFIGURED BRANCH
+	BNE DONT_INCREMENT
 	LDR R0,=0x20000000 ;REAL_TIME Variable
 	LDR R1,[R0]
 	ADD R1,R1,#1
 	
+DONT_INCREMENT
 	
 ;	LDR R3, =0x40010C0C       ; GPIOB Output Data Register address
 ;    LDR R4, [R3]              ; Read current output state
@@ -354,7 +360,6 @@ TIM4_IRQHandler
 	LDR R1,[R0]
 	MOV R1,#0
 	STR R1,[R0]
-	
 	
 	
 SKIP_ALARM_ON
